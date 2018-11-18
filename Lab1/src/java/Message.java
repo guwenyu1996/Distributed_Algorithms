@@ -53,7 +53,7 @@ public class Message {
      * @return whether this massage can be delivered
      */
     public boolean checkDependency(List<Integer>  ts){
-        return dependency.checkDepency(target,ts);
+        return dependency.checkDependency(target,ts);
     }
 
 }
