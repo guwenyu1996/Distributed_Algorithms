@@ -1,11 +1,17 @@
+package java;
+
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+
 public class Message {
     String content = "";
     long target = 0;  //the target node
     long nodes = 0; ///number of target in the system
+
+
     List<Integer>  ts = new LinkedList<Integer>();
-    Dependency dependency = new Dependency();
+    private Map<Integer, List<Integer>> buffer;
 
     /**
      *
@@ -27,9 +33,7 @@ public class Message {
         this.content = content;
     }
 
-    public void setDependency(Dependency dependency) {
-        this.dependency = dependency;
-    }
+
 
     public void setTarget(long target) {
         this.target = target;
@@ -43,17 +47,14 @@ public class Message {
         return content;
     }
 
-    public Dependency getDependency() {
-        return dependency;
+    public Map<Integer, List<Integer>> getBuffer() {
+        return buffer;
     }
 
-    /**
-     *
-     * @param ts time stamp of the target node
-     * @return whether this massage can be delivered
-     */
-    public boolean checkDependency(List<Integer>  ts){
-        return dependency.checkDependency(target,ts);
+    public void setBuffer(Map<Integer, List<Integer>> buffer) {
+        this.buffer = buffer;
     }
+
+
 
 }
