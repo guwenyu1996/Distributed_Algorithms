@@ -64,12 +64,17 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
 
     public void send(int node, Message message) throws RemoteException{
 
+        // todo add synchronized block
+        synchronized (this){
+
+        }
+
     }
 
     /**
      * {@inheritDoc}
      */
-    public void receive(Message message){
+    public synchronized void receive(Message message) throws RemoteException{
 
         // check whether the message could be delivered
         if(isDeliveryReady(message)){
@@ -107,9 +112,9 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
 
 
     /**
-     * {@inheritDoc}
+     *
      */
-    public void deliver(Message message){
+    private void deliver(Message message){
         processMessage(message);
 
         // update local clock
