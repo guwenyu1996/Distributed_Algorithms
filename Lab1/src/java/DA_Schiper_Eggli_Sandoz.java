@@ -80,7 +80,6 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
             while(checkPendingList(temp)){
                 deliver(temp);
                 pendingMessage.remove(temp);
-                temp = null;
             }
         }else
             pendingMessage.add(message);
