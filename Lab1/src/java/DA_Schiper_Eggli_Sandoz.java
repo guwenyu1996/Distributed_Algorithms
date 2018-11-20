@@ -76,14 +76,34 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
             deliver(message);
 
             // check the message in pending list could be delivered
-            for(Message msg: pendingMessage){
-                if(isDeliveryReady(msg)){
-                    deliver(msg);
-                    pendingMessage.remove(msg);
-                }
+            Message temp = null;
+            while(checkPendingList(temp)){
+                deliver(temp);
+                pendingMessage.remove(temp);
+                temp = null;
             }
         }else
             pendingMessage.add(message);
+    }
+
+    /**
+     * Check whether there exists a message in pending list could be delivered.
+     * @param message the pointer to message could be delivered
+     * @return true if the message could be delivered right away
+     *         false if all messages in pending list could not delivered
+     */
+    private boolean checkPendingList(Message message){
+        boolean result = false;
+
+        for(Message msg: pendingMessage){
+            if(isDeliveryReady(msg)){
+                message = msg;
+                result = true;
+                break;
+            }
+        }
+
+        return result;
     }
 
 
