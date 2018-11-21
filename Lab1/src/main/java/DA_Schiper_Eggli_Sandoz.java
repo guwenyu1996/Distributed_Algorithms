@@ -2,7 +2,9 @@ import org.apache.log4j.Logger;
 
 import java.rmi.RemoteException;
 import java.util.*;
-
+import java.rmi.Naming;
+import java.net.MalformedURLException;
+import java.rmi.NotBoundException;
 
 public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
 
@@ -43,6 +45,13 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
      */
     private List<Message> deliveredMessage;
 
+    /**
+     * List of all servers in the system
+     */
+    private Map<Integer,DA_Schiper_Eggli_Sandoz_RMI> processList;
+
+    private Map<Integer, String> port; //map each node with its port number
+
     final static Logger logger = Logger.getLogger(DA_Schiper_Eggli_Sandoz.class);
 
     /**
@@ -56,11 +65,40 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
         ts = new ArrayList<>();
     }
 
-    public void send(int node, Message message) throws RemoteException{
+    public void send(int node, Message message, int delay) throws RemoteException{
+        //if the process of index node is not initialized, initialize it
+        if(!processList.containsKey(node)){
+            try {
+                DA_Schiper_Eggli_Sandoz_RMI newProcess = (DA_Schiper_Eggli_Sandoz_RMI) Naming.lookup(port.get(node));
+                processList.put(node, newProcess);
+            } catch (RemoteException e1) {
+                e1.printStackTrace();
+            } catch (MalformedURLException e2) {
+                e2.printStackTrace();
+            } catch (NotBoundException e3) {
+                e3.printStackTrace();
+            }
+        }
 
-        // todo add synchronized block
+        // add synchronized block
         synchronized (this){
+            increaseTimestamp();
+            message.setBuffer(this.localBuffer);
+            message.setTs(this.ts);
+        }
 
+        // delay the sending of message
+        try{
+            Thread.sleep(delay);
+        } catch (InterruptedException e1){
+            e1.printStackTrace();
+        }
+
+        try {
+            processList.get(node).receive(message);
+            localBuffer.put(node, ts);
+        } catch (RemoteException e) {
+            e.printStackTrace();
         }
 
     }
@@ -198,5 +236,10 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
 
         return maxClock;
     }
+
+    public int getIndex() {
+        return index;
+    }
+
 
 }
