@@ -110,7 +110,6 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
         message.setBuffer(this.localBuffer);
         message.setTs(this.ts);
 
-
         logger.info("Send Message from P" + index + " to P" + destId +
                 " with buffer " + message.getBuffer() +
                 " and timestamp " + message.getTs());
