@@ -11,10 +11,7 @@ public class Message {
     private List<Integer> ts;
     private Map<Integer, List<Integer>> buffer;
 
-    public Message(int destId, int srcId, int delay){
-        this.destId = destId;
-        this.srcId = srcId;
-        this.delay = delay;
+    public Message(){
     }
 
     public int getSrcId() {
