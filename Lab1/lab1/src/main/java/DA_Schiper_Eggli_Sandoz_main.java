@@ -18,8 +18,7 @@ public class DA_Schiper_Eggli_Sandoz_main {
 
     final static Logger logger = Logger.getLogger(DA_Schiper_Eggli_Sandoz_main.class);
 
-    public static void start(){
-
+    public static String[] readConfiguration(){
         // initialize node property
         PropertiesConfiguration config = new PropertiesConfiguration();
         try{
@@ -33,13 +32,20 @@ public class DA_Schiper_Eggli_Sandoz_main {
         }
 
         String[] urls = config.getStringArray("node_url");
-        System.out.println(urls);
+        return urls;
+    }
+
+    public static void start(){
+
+        String[] urls = readConfiguration();
+
         List<DA_Schiper_Eggli_Sandoz> processes = new ArrayList<DA_Schiper_Eggli_Sandoz>();
         int index = 0;
 
         try{
             for(String url: urls){
                 DA_Schiper_Eggli_Sandoz process = new DA_Schiper_Eggli_Sandoz(urls.length, index);
+                new Thread(process).start();
                 Naming.bind(url, process);
                 processes.add(process);
 
