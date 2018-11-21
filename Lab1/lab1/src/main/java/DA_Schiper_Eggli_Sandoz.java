@@ -88,10 +88,9 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
      *
      * @param destId
      * @param message
-     * @param delay in millisecond
      * @throws RemoteException
      */
-    public void send(int destId, Message message, int delay) throws RemoteException{
+    public void send(int destId, Message message) throws RemoteException{
 
         //if the process of index node is not initialized, initialize it
         if(!processList.containsKey(destId)){
@@ -107,26 +106,15 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
             }
         }
 
-        // add synchronized block
-//        synchronized (this){
         increaseTimestamp();
         message.setBuffer(this.localBuffer);
         message.setTs(this.ts);
-//        }
 
-        // delay the sending of message
-        try{
-            Thread.sleep(delay);
-            logger.info("Send Message from P" + index + " to P" + destId +
-                    " with buffer " + message.getBuffer() +
-                    " and timestamp " + message.getTs());
-            processList.get(destId).receive(message);
-            localBuffer.put(destId, ts);
-        } catch (InterruptedException e1){
-            e1.printStackTrace();
-        } catch (RemoteException e2){
-            e2.printStackTrace();
-        }
+        logger.info("Send Message from P" + index + " to P" + destId +
+                " with buffer " + message.getBuffer() +
+                " and timestamp " + message.getTs());
+        processList.get(destId).receive(message);
+        localBuffer.put(destId, ts);
 
     }
 
@@ -134,6 +122,14 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
      * {@inheritDoc}
      */
     public synchronized void receive(Message message) throws RemoteException{
+
+        try{
+            if(message.getDelay() > 0)
+                Thread.sleep(message.getDelay());
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
+
 
         receivedMessage.add(message);
         logger.info("P" + message.getDestId() + " receive a message from P" + message.getSrcId() +

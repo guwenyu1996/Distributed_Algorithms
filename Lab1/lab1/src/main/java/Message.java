@@ -12,9 +12,10 @@ public class Message implements Serializable {
     private List<Integer> ts;
     private Map<Integer, List<Integer>> buffer;
 
-    public Message(int srcId, int destId){
+    public Message(int srcId, int destId, int delay){
         this.destId = destId;
         this.srcId = srcId;
+        this.delay = delay;
     }
 
     public int getSrcId() {
@@ -23,6 +24,10 @@ public class Message implements Serializable {
 
     public int getDelay() {
         return delay;
+    }
+
+    public void setDelay(int delay) {
+        this.delay = delay;
     }
 
     public int getDestId() {

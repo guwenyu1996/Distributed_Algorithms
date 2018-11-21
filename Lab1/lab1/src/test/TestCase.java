@@ -72,20 +72,22 @@ public class TestCase {
     public void Test1()  throws RemoteException{
         logger.info("Test 1 starts !");
 
-        Message message1 = new Message(0, 1);
+        Message message1 = new Message(0, 1, 10000);
         message1.setContent("This is message 1");
 
-        processes.get(0).send(1, message1, 10000);
+        processes.get(0).send(1, message1);
+        logger.warn("Message 1 send");
 
-        Message message2 = new Message(0, 2);
-        message2.setContent("This is message 2");
+//        Message message2 = new Message(0, 2, 100);
+//        message2.setContent("This is message 2");
+//
+//        processes.get(0).send(2, message2);
 
-        processes.get(0).send(2, message2, 100);
-
-        Message message3 = new Message(2, 1);
+        Message message3 = new Message(2, 1, 300);
         message3.setContent("This is message 3");
 
-        processes.get(2).send(1, message3, 300);
+        processes.get(2).send(1, message3);
+        logger.warn("Message 3 send");
 
     }
 
