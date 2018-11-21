@@ -12,16 +12,14 @@ public class DelayedReceive implements Runnable{
     public void run(){
         try{
             Thread.sleep(message.getDelay());
+            des.receive(message);
         }catch (InterruptedException e){
             e.printStackTrace();
-        }
-
-        try{
-            des.receive(message);
-        } catch (
-        RemoteException e1) {
+        }catch (
+                RemoteException e1) {
             e1.printStackTrace();
         }
+
     }
 
 }

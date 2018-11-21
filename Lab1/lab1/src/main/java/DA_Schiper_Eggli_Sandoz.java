@@ -1,5 +1,3 @@
-
-
 import org.apache.log4j.Logger;
 
 import java.net.MalformedURLException;
@@ -110,7 +108,6 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
         message.setBuffer(this.localBuffer);
         message.setTs(this.ts);
 
-
         logger.info("Send Message from P" + index + " to P" + destId +
                 " with buffer " + message.getBuffer() +
                 " and timestamp " + message.getTs());
@@ -138,7 +135,7 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
 
             // check the message in pending list could be delivered
             Message temp = null;
-            while(checkPendingList(temp)){
+            while((temp = checkPendingList(temp)) != null){
                 deliver(temp);
                 pendingMessage.remove(temp);
             }
@@ -156,18 +153,15 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
      * @return true if the message could be delivered right away
      *         false if all messages in pending list could not delivered
      */
-    private boolean checkPendingList(Message message){
-        boolean result = false;
+    private Message checkPendingList(Message message){
 
         for(Message msg: pendingMessage){
             if(isDeliveryReady(msg)){
-                message = msg;
-                result = true;
-                break;
+                return msg;
             }
         }
 
-        return result;
+        return null;
     }
 
 
@@ -183,6 +177,9 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
 
         // update local buffer
         mergeBuffer(message.getBuffer());
+
+        logger.info("Deliver message \" " + message.getContent() + " \" in process " + index +
+                " after which buffer " + this.localBuffer + " state " + this.ts);
     }
 
     /**
@@ -190,7 +187,7 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
      * @param message
      */
     private void processMessage(Message message){
-        logger.info("Deliver message \" " + message.getContent() + " \" in process " + index);
+
         deliveredMessage.add(message);
         increaseTimestamp();
     }
