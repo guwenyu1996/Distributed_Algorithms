@@ -1,5 +1,3 @@
-package java;
-
 import org.apache.log4j.Logger;
 
 import java.rmi.RemoteException;
@@ -45,31 +43,32 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
      */
     private List<Message> deliveredMessage;
 
-
-    private Map<Integer, String> port; //map each node with its port number
-
     final static Logger logger = Logger.getLogger(DA_Schiper_Eggli_Sandoz.class);
 
     /**
      *
-     * @param processNum number of nodes in the system
-     * @param port map each node with its port number
+     * @param processNum
+     * @param index
      */
-    public DA_Schiper_Eggli_Sandoz(int processNum, int index, Map<Integer, String> port){
+    public DA_Schiper_Eggli_Sandoz(int processNum, int index){
         this.index =index;
         this.processNum = processNum;
-        this.port = port;
         ts = new ArrayList<>();
     }
 
     public void send(int node, Message message) throws RemoteException{
+
+        // todo add synchronized block
+        synchronized (this){
+
+        }
 
     }
 
     /**
      * {@inheritDoc}
      */
-    public void receive(Message message){
+    public synchronized void receive(Message message) throws RemoteException{
 
         // check whether the message could be delivered
         if(isDeliveryReady(message)){
@@ -107,9 +106,9 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
 
 
     /**
-     * {@inheritDoc}
+     *
      */
-    public void deliver(Message message){
+    private void deliver(Message message){
         processMessage(message);
 
         // update local clock
