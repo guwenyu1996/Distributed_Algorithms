@@ -76,21 +76,17 @@ public class TestCase {
         message1.setContent("This is message 1");
 
         processes.get(0).send(1, message1);
-        logger.warn("Message 1 send");
 
         Message message2 = new Message(0, 2, 100);
         message2.setContent("This is message 2");
 
         processes.get(0).send(2, message2);
 
-        Message message3 = new Message(2, 1, 300);
-        message3.setContent("This is message 3");
-
-        processes.get(2).send(1, message3);
-        logger.warn("Message 3 send");
-
-
-
+//        Message message3 = new Message(2, 1, 300);
+//        message3.setContent("This is message 3");
+//
+//        processes.get(2).send(1, message3);
+//        logger.warn("Message 3 send");
         try{
             Thread.sleep(2000);
         }catch (InterruptedException e){
