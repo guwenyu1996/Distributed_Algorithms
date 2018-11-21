@@ -6,10 +6,7 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI, Runnable {
 
@@ -71,21 +68,30 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI, Run
         receivedMessage = new ArrayList<Message>();
         pendingMessage = new ArrayList<Message>();
         deliveredMessage = new ArrayList<Message>();
+        port = new HashMap<Integer, String>();
+
+        String[] urls = DA_Schiper_Eggli_Sandoz_main.readConfiguration();
+        for(int i = 0; i < urls.length; i ++)
+            port.put(i, urls[i]);
+
+        logger.info("Initialize process " + index + " of " + processNum);
+
     }
 
     /**
      *
-     * @param node
+     * @param destId
      * @param message
-     * @param delay
+     * @param delay in milli
      * @throws RemoteException
      */
-    public void send(int node, Message message, int delay) throws RemoteException{
+    public void send(int destId, Message message, int delay) throws RemoteException{
+
         //if the process of index node is not initialized, initialize it
-        if(!processList.containsKey(node)){
+        if(!processList.containsKey(destId)){
             try {
-                DA_Schiper_Eggli_Sandoz_RMI newProcess = (DA_Schiper_Eggli_Sandoz_RMI) Naming.lookup(port.get(node));
-                processList.put(node, newProcess);
+                DA_Schiper_Eggli_Sandoz_RMI newProcess = (DA_Schiper_Eggli_Sandoz_RMI) Naming.lookup(port.get(destId));
+                processList.put(destId, newProcess);
             } catch (RemoteException e1) {
                 e1.printStackTrace();
             } catch (MalformedURLException e2) {
@@ -100,20 +106,20 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI, Run
             increaseTimestamp();
             message.setBuffer(this.localBuffer);
             message.setTs(this.ts);
+            logger.info("Send Message from P" + index + " to P" + destId +
+                    " with buffer " + message.getBuffer() +
+                    " and timestamp " + message.getTs());
         }
 
         // delay the sending of message
         try{
             Thread.sleep(delay);
+            processList.get(destId).receive(message);
+            localBuffer.put(destId, ts);
         } catch (InterruptedException e1){
             e1.printStackTrace();
-        }
-
-        try {
-            processList.get(node).receive(message);
-            localBuffer.put(node, ts);
-        } catch (RemoteException e) {
-            e.printStackTrace();
+        } catch (RemoteException e2){
+            e2.printStackTrace();
         }
 
     }
@@ -122,6 +128,10 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI, Run
      * {@inheritDoc}
      */
     public synchronized void receive(Message message) throws RemoteException{
+
+        receivedMessage.add(message);
+        logger.info("P" + message.getDestId() + " receive a message from P" + message.getSrcId() +
+                " with buffer " + message.getBuffer());
 
         // check whether the message could be delivered
         if(isDeliveryReady(message)){
@@ -133,8 +143,12 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI, Run
                 deliver(temp);
                 pendingMessage.remove(temp);
             }
-        }else
+        }else{
             pendingMessage.add(message);
+            logger.info("P" + message.getDestId() + " postpone a message from P" + message.getSrcId() +
+                    " with buffer " + message.getBuffer() + " at current state " + ts);
+        }
+
     }
 
     /**
@@ -255,7 +269,7 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI, Run
     }
 
     /**
-     * Function for thread 
+     * Function for thread
      */
     public void run(){
         logger.info("Run process " + index);
