@@ -6,9 +6,11 @@ import java.net.MalformedURLException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
 import java.util.*;
 
-public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI, Runnable {
+public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
+        implements DA_Schiper_Eggli_Sandoz_RMI, Runnable {
 
     /**
      * The total number of process in the system
@@ -61,14 +63,18 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI, Run
      * @param processNum
      * @param index
      */
-    public DA_Schiper_Eggli_Sandoz(int processNum, int index){
+    public DA_Schiper_Eggli_Sandoz(int processNum, int index) throws RemoteException{
         this.index =index;
         this.processNum = processNum;
         ts = new ArrayList<Integer>();
+        for(int i = 0; i < processNum; i ++)
+            ts.add(0);
+        localBuffer = new HashMap<Integer, List<Integer>>();
         receivedMessage = new ArrayList<Message>();
         pendingMessage = new ArrayList<Message>();
         deliveredMessage = new ArrayList<Message>();
         port = new HashMap<Integer, String>();
+        processList = new HashMap<Integer, DA_Schiper_Eggli_Sandoz_RMI>();
 
         String[] urls = DA_Schiper_Eggli_Sandoz_main.readConfiguration();
         for(int i = 0; i < urls.length; i ++)
@@ -82,7 +88,7 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI, Run
      *
      * @param destId
      * @param message
-     * @param delay in milli
+     * @param delay in millisecond
      * @throws RemoteException
      */
     public void send(int destId, Message message, int delay) throws RemoteException{
@@ -102,18 +108,18 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI, Run
         }
 
         // add synchronized block
-        synchronized (this){
-            increaseTimestamp();
-            message.setBuffer(this.localBuffer);
-            message.setTs(this.ts);
-            logger.info("Send Message from P" + index + " to P" + destId +
-                    " with buffer " + message.getBuffer() +
-                    " and timestamp " + message.getTs());
-        }
+//        synchronized (this){
+        increaseTimestamp();
+        message.setBuffer(this.localBuffer);
+        message.setTs(this.ts);
+//        }
 
         // delay the sending of message
         try{
             Thread.sleep(delay);
+            logger.info("Send Message from P" + index + " to P" + destId +
+                    " with buffer " + message.getBuffer() +
+                    " and timestamp " + message.getTs());
             processList.get(destId).receive(message);
             localBuffer.put(destId, ts);
         } catch (InterruptedException e1){

@@ -22,7 +22,7 @@ public class DA_Schiper_Eggli_Sandoz_main {
         // initialize node property
         PropertiesConfiguration config = new PropertiesConfiguration();
         try{
-            config.read(new FileReader("./lab1/src/main/resources/url.properties"));
+            config.read(new FileReader("src/main/resources/url.properties"));
         }catch(IOException e1){
             logger.error("Failed to read configurations. Throw by IOException");
             e1.printStackTrace();
@@ -66,9 +66,9 @@ public class DA_Schiper_Eggli_Sandoz_main {
         }
 
         // Create and install a security manager
-        if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new RMISecurityManager());
-        }
+//        if (System.getSecurityManager() == null) {
+//            System.setSecurityManager(new RMISecurityManager());
+//        }
 
         start();
     }

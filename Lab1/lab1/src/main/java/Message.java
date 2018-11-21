@@ -1,7 +1,8 @@
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
-public class Message {
+public class Message implements Serializable {
 
     private int destId;                         // id of destination process
     private int srcId;                          // id of source process
@@ -11,7 +12,9 @@ public class Message {
     private List<Integer> ts;
     private Map<Integer, List<Integer>> buffer;
 
-    public Message(){
+    public Message(int srcId, int destId){
+        this.destId = destId;
+        this.srcId = srcId;
     }
 
     public int getSrcId() {
