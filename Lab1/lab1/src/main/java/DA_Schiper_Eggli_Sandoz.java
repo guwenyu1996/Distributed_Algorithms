@@ -1,12 +1,17 @@
+
+
 import org.apache.log4j.Logger;
 
-import java.rmi.RemoteException;
-import java.util.*;
-import java.rmi.Naming;
 import java.net.MalformedURLException;
+import java.rmi.Naming;
 import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
+public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI, Runnable {
 
     /**
      * The total number of process in the system
@@ -48,7 +53,7 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
     /**
      * List of all servers in the system
      */
-    private Map<Integer,DA_Schiper_Eggli_Sandoz_RMI> processList;
+    private Map<Integer, DA_Schiper_Eggli_Sandoz_RMI> processList;
 
     private Map<Integer, String> port; //map each node with its port number
 
@@ -62,9 +67,19 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
     public DA_Schiper_Eggli_Sandoz(int processNum, int index){
         this.index =index;
         this.processNum = processNum;
-        ts = new ArrayList<>();
+        ts = new ArrayList<Integer>();
+        receivedMessage = new ArrayList<Message>();
+        pendingMessage = new ArrayList<Message>();
+        deliveredMessage = new ArrayList<Message>();
     }
 
+    /**
+     *
+     * @param node
+     * @param message
+     * @param delay
+     * @throws RemoteException
+     */
     public void send(int node, Message message, int delay) throws RemoteException{
         //if the process of index node is not initialized, initialize it
         if(!processList.containsKey(node)){
@@ -144,7 +159,8 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
 
 
     /**
-     *
+     * Deliver a process.
+     * @param message
      */
     private void deliver(Message message){
         processMessage(message);
@@ -161,7 +177,7 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
      * @param message
      */
     private void processMessage(Message message){
-        logger.info("Deliver message \" " + message.content + " \" in process " + index);
+        logger.info("Deliver message \" " + message.getContent() + " \" in process " + index);
         deliveredMessage.add(message);
         increaseTimestamp();
     }
@@ -176,7 +192,8 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
     /**
      * Check whether the received message could be delivered or not.
      * @param message the message to be checked
-     * @return
+     * @return true if message could be delivered right away
+     *         false then the message will be put into pending list
      */
     private boolean isDeliveryReady(Message message){
 
@@ -204,7 +221,7 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
      * @param messageBuffer buffer accompanied in the message
      */
     private void mergeBuffer(Map<Integer, List<Integer>> messageBuffer){
-        Map<Integer, List<Integer>> maxBuffer = new HashMap<>();
+        Map<Integer, List<Integer>> maxBuffer = new HashMap<Integer, List<Integer>>();
 
         for(Map.Entry<Integer, List<Integer>> list: messageBuffer.entrySet()){
             int processId = list.getKey();
@@ -230,15 +247,18 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
      * @return a new clock merging clock1 and clock2
      */
     private List<Integer> mergeClocks(List<Integer> clock1, List<Integer> clock2){
-        List<Integer> maxClock = new ArrayList<>();
+        List<Integer> maxClock = new ArrayList<Integer>();
         for (int i = 0; i < clock1.size(); i ++)
             maxClock.add(Math.max(clock1.get(i), clock2.get(i)));
 
         return maxClock;
     }
 
-    public int getIndex() {
-        return index;
+    /**
+     * Function for thread 
+     */
+    public void run(){
+        logger.info("Run process " + index);
     }
 
 

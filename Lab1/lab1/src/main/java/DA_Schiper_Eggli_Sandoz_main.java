@@ -5,9 +5,13 @@ import org.apache.log4j.Logger;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.rmi.*;
+import java.rmi.AlreadyBoundException;
+import java.rmi.Naming;
+import java.rmi.RMISecurityManager;
+import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.ArrayList;
+import java.util.List;
 
 
 public class DA_Schiper_Eggli_Sandoz_main {
@@ -19,7 +23,7 @@ public class DA_Schiper_Eggli_Sandoz_main {
         // initialize node property
         PropertiesConfiguration config = new PropertiesConfiguration();
         try{
-            config.read(new FileReader("url.properties"));
+            config.read(new FileReader("./lab1/src/main/resources/url.properties"));
         }catch(IOException e1){
             logger.error("Failed to read configurations. Throw by IOException");
             e1.printStackTrace();
@@ -29,12 +33,13 @@ public class DA_Schiper_Eggli_Sandoz_main {
         }
 
         String[] urls = config.getStringArray("node_url");
-        ArrayList<DA_Schiper_Eggli_Sandoz_RMI> processes = new ArrayList<>();
+        System.out.println(urls);
+        List<DA_Schiper_Eggli_Sandoz> processes = new ArrayList<DA_Schiper_Eggli_Sandoz>();
         int index = 0;
 
         try{
             for(String url: urls){
-                DA_Schiper_Eggli_Sandoz_RMI process = new DA_Schiper_Eggli_Sandoz(urls.length, index);
+                DA_Schiper_Eggli_Sandoz process = new DA_Schiper_Eggli_Sandoz(urls.length, index);
                 Naming.bind(url, process);
                 processes.add(process);
 
