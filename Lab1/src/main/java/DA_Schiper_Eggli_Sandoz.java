@@ -1,5 +1,3 @@
-package java;
-
 import org.apache.log4j.Logger;
 
 import java.rmi.RemoteException;
@@ -45,20 +43,16 @@ public class DA_Schiper_Eggli_Sandoz implements DA_Schiper_Eggli_Sandoz_RMI {
      */
     private List<Message> deliveredMessage;
 
-
-    private Map<Integer, String> port; //map each node with its port number
-
     final static Logger logger = Logger.getLogger(DA_Schiper_Eggli_Sandoz.class);
 
     /**
      *
-     * @param processNum number of nodes in the system
-     * @param port map each node with its port number
+     * @param processNum
+     * @param index
      */
-    public DA_Schiper_Eggli_Sandoz(int processNum, int index, Map<Integer, String> port){
+    public DA_Schiper_Eggli_Sandoz(int processNum, int index){
         this.index =index;
         this.processNum = processNum;
-        this.port = port;
         ts = new ArrayList<>();
     }
 

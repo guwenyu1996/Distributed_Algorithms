@@ -1,5 +1,3 @@
-package java;
-
 import java.awt.event.MouseWheelEvent;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
