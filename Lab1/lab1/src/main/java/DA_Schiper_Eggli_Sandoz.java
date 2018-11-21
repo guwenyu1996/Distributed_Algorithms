@@ -108,7 +108,8 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
 
         increaseTimestamp();
         message.setBuffer(this.localBuffer);
-        message.setTs(new ArrayList<Integer>(this.ts));
+        message.setTs(this.ts);
+
 
         logger.info("Send Message from P" + index + " to P" + destId +
                 " with buffer " + message.getBuffer() +
@@ -118,7 +119,7 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
         DelayedReceive delayedProcess = new DelayedReceive(processList.get(destId), message);
         new Thread(delayedProcess).start();
 
-        localBuffer.put(destId, ts);
+        localBuffer.put(destId, Util.copyList(this.ts));
 
     }
 
@@ -235,16 +236,16 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
     private void mergeBuffer(Map<Integer, List<Integer>> messageBuffer){
         Map<Integer, List<Integer>> maxBuffer = new HashMap<Integer, List<Integer>>();
 
-        for(Map.Entry<Integer, List<Integer>> list: messageBuffer.entrySet()){
-            int processId = list.getKey();
+        for(Map.Entry<Integer, List<Integer>> iter: messageBuffer.entrySet()){
+            int processId = iter.getKey();
 
             if(processId == index)
                 continue;
 
             if(localBuffer.containsKey(processId))
-                maxBuffer.put(processId, mergeClocks(localBuffer.get(processId), list.getValue()));
+                maxBuffer.put(processId, mergeClocks(localBuffer.get(processId), iter.getValue()));
             else
-                maxBuffer.put(processId, list.getValue());
+                maxBuffer.put(processId, Util.copyList(iter.getValue()));
         }
 
         localBuffer.clear();

@@ -52,7 +52,7 @@ public class Message implements Serializable {
         this.buffer.clear();
 
         for(Map.Entry<Integer, List<Integer>> iter: buffer.entrySet())
-            this.buffer.put(new Integer(iter.getKey()), copyList(iter.getValue()));
+            this.buffer.put(new Integer(iter.getKey()), Util.copyList(iter.getValue()));
     }
 
     public List<Integer> getTs() {
@@ -62,18 +62,7 @@ public class Message implements Serializable {
     public void setTs(List<Integer> clock) {
         this.ts.clear();
 
-        this.ts = copyList(clock);
+        this.ts = Util.copyList(clock);
     }
-
-
-    private List<Integer> copyList(List<Integer> list){
-        List<Integer> temp = new ArrayList<Integer>();
-
-        for(Integer i: list)
-            temp.add(new Integer(i));
-
-        return temp;
-    }
-
 
 }
