@@ -35,23 +35,20 @@ public class DA_Schiper_Eggli_Sandoz_main {
         return urls;
     }
 
-    public static void start(){
+    public static void start() {
 
         String[] urls = readConfiguration();
 
         List<DA_Schiper_Eggli_Sandoz> processes = new ArrayList<DA_Schiper_Eggli_Sandoz>();
         int index = 0;
 
-        try{
-            for(String url: urls){
+        try {
+            for (String url : urls) {
                 DA_Schiper_Eggli_Sandoz process = new DA_Schiper_Eggli_Sandoz(urls.length, index);
                 new Thread(process).start();
                 Naming.bind(url, process);
                 processes.add(process);
-
-                index ++;
             }
-
         }catch (RemoteException e1) {
             e1.printStackTrace();
         } catch (AlreadyBoundException e2) {
@@ -59,9 +56,7 @@ public class DA_Schiper_Eggli_Sandoz_main {
         } catch (MalformedURLException e3) {
             e3.printStackTrace();
         }
-
     }
-
     public static void main(String args[]) {
 
         try {
