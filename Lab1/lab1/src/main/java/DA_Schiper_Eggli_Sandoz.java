@@ -113,7 +113,11 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
         logger.info("Send Message from P" + index + " to P" + destId +
                 " with buffer " + message.getBuffer() +
                 " and timestamp " + message.getTs());
-        processList.get(destId).receive(message);
+
+        //create a new thread to sleep and send
+        DelayedReceive delayedProcess = new DelayedReceive(processList.get(destId), message);
+        new Thread(delayedProcess).start();
+
         localBuffer.put(destId, ts);
 
     }
@@ -122,14 +126,6 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
      * {@inheritDoc}
      */
     public synchronized void receive(Message message) throws RemoteException{
-
-        try{
-            if(message.getDelay() > 0)
-                Thread.sleep(message.getDelay());
-        }catch (InterruptedException e){
-            e.printStackTrace();
-        }
-
 
         receivedMessage.add(message);
         logger.info("P" + message.getDestId() + " receive a message from P" + message.getSrcId() +
