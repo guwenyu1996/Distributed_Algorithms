@@ -41,7 +41,7 @@ public class Message implements Serializable {
     }
 
     public void setContent(String content) {
-        this.content = content;
+        this.content = new String(content);
     }
 
     public Map<Integer, List<Integer>> getBuffer() {
@@ -63,6 +63,11 @@ public class Message implements Serializable {
         this.ts.clear();
 
         this.ts = Util.copyList(clock);
+    }
+
+    @Override
+    public String toString(){
+        return getSrcId() + " " + getDestId() + " " + getDelay();
     }
 
 }
