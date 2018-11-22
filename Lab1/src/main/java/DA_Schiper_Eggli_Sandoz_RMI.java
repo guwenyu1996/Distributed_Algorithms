@@ -19,4 +19,5 @@ public interface DA_Schiper_Eggli_Sandoz_RMI extends Remote  {
 
     void test() throws RemoteException;
 
+    void clear() throws RemoteException;
 }

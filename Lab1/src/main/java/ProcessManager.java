@@ -32,7 +32,10 @@ public class ProcessManager {
             e2.printStackTrace();
         }
 
-        return config.getStringArray("node_url");
+
+        String[] urls = config.getStringArray("node_url");
+        logger.info("read url : " +  urls[0]);
+        return urls;
     }
 
     /**

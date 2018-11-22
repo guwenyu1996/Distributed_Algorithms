@@ -146,6 +146,16 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
         }
 
     }
+    public void clear() throws RemoteException{
+        ts = new ArrayList<Integer>();
+        for(int i = 0; i < processNum; i ++)
+            ts.add(0);
+        localBuffer = new HashMap<Integer, List<Integer>>();
+        receivedMessage = new ArrayList<Message>();
+        pendingMessage = new ArrayList<Message>();
+        deliveredMessage = new ArrayList<Message>();
+        logger.info(" current buffer " + this.localBuffer + "  current ts " + ts);
+    }
 
     /**
      * Check whether there exists a message in pending list could be delivered.
