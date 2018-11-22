@@ -5,18 +5,15 @@ import org.apache.log4j.Logger;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.rmi.AlreadyBoundException;
-import java.rmi.Naming;
-import java.rmi.RMISecurityManager;
-import java.rmi.RemoteException;
+import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class DA_Schiper_Eggli_Sandoz_main {
 
     final static Logger logger = Logger.getLogger(DA_Schiper_Eggli_Sandoz_main.class);
+    private static String prefix = "rmi://";
 
     public static String[] readConfiguration(){
         // initialize node property
@@ -44,10 +41,18 @@ public class DA_Schiper_Eggli_Sandoz_main {
 
         try {
             for (String url : urls) {
-                DA_Schiper_Eggli_Sandoz process = new DA_Schiper_Eggli_Sandoz(urls.length, index);
-                new Thread(process).start();
-                Naming.bind(url, process);
+
+                DA_Schiper_Eggli_Sandoz process;
+
+                if(isLocalProcess(url)){
+                    process = new DA_Schiper_Eggli_Sandoz(urls.length, index);
+                    new Thread(process).start();
+                    Naming.bind(url, process);
+                }else
+                    process = (DA_Schiper_Eggli_Sandoz)Naming.lookup(urls[index]);
+
                 processes.add(process);
+
             }
         }catch (RemoteException e1) {
             e1.printStackTrace();
@@ -55,8 +60,21 @@ public class DA_Schiper_Eggli_Sandoz_main {
             e2.printStackTrace();
         } catch (MalformedURLException e3) {
             e3.printStackTrace();
+        } catch (NotBoundException e4){
+            e4.printStackTrace();
         }
     }
+
+    private static boolean isLocalProcess(String url){
+
+        if(url.startsWith(prefix + "localhost"))
+            return true;
+        else if(url.startsWith(prefix + "127.0.0.1"))
+            return true;
+        else
+            return false;
+    }
+
     public static void main(String args[]) {
 
         try {
@@ -66,9 +84,9 @@ public class DA_Schiper_Eggli_Sandoz_main {
         }
 
         // Create and install a security manager
-//        if (System.getSecurityManager() == null) {
-//            System.setSecurityManager(new RMISecurityManager());
-//        }
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new RMISecurityManager());
+        }
 
         start();
     }

@@ -52,7 +52,10 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
      */
     private Map<Integer, DA_Schiper_Eggli_Sandoz_RMI> processList;
 
-    private Map<Integer, String> port; //map each node with its port number
+    /**
+     * Map of url of remote process and its process index.
+     */
+    private Map<Integer, String> port;
 
     final static Logger logger = Logger.getLogger(DA_Schiper_Eggli_Sandoz.class);
 
@@ -83,10 +86,7 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
     }
 
     /**
-     *
-     * @param destId
-     * @param message
-     * @throws RemoteException
+     * {@inheritDoc}
      */
     public void send(int destId, Message message) throws RemoteException{
 
@@ -135,7 +135,7 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
 
             // check the message in pending list could be delivered
             Message temp = null;
-            while((temp = checkPendingList(temp)) != null){
+            while((temp = checkPendingList()) != null){
                 deliver(temp);
                 pendingMessage.remove(temp);
             }
@@ -149,11 +149,10 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
 
     /**
      * Check whether there exists a message in pending list could be delivered.
-     * @param message the pointer to message could be delivered
-     * @return true if the message could be delivered right away
-     *         false if all messages in pending list could not delivered
+     * @return Message if the message could be delivered right away
+     *         null if all messages in pending list could not delivered
      */
-    private Message checkPendingList(Message message){
+    private Message checkPendingList(){
 
         for(Message msg: pendingMessage){
             if(isDeliveryReady(msg)){
@@ -183,7 +182,7 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
     }
 
     /**
-     *
+     * Process a message.
      * @param message
      */
     private void processMessage(Message message){
