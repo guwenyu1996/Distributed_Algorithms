@@ -37,7 +37,7 @@ public class DA_Schiper_Eggli_Sandoz_main {
     public static void start() {
         String[] urls = readConfiguration();
 
-        List<DA_Schiper_Eggli_Sandoz> processes = new ArrayList<DA_Schiper_Eggli_Sandoz>();
+        List<DA_Schiper_Eggli_Sandoz_RMI> processes = new ArrayList<DA_Schiper_Eggli_Sandoz_RMI>();
         int index = 0;
 
         try {
@@ -64,7 +64,7 @@ public class DA_Schiper_Eggli_Sandoz_main {
         }
     }
 
-    private static boolean isLocalProcess(String url){
+    public static boolean isLocalProcess(String url){
 
         if(url.startsWith(prefix + "localhost"))
             return true;
@@ -87,7 +87,7 @@ public class DA_Schiper_Eggli_Sandoz_main {
             System.setSecurityManager(new RMISecurityManager());
         }
 
-        start();
+        localStart(0);
     }
 
     /**

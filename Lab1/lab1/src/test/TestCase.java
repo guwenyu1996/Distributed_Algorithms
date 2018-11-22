@@ -1,8 +1,8 @@
-
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -11,6 +11,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.ArrayList;
@@ -39,19 +40,15 @@ public class TestCase {
         }
 
         String[] urls = config.getStringArray("node_url");
-
-        try {
-            LocateRegistry.createRegistry(1099);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-
-
         int index = 0;
 
         try{
+            LocateRegistry.createRegistry(1099);
+
+            DA_Schiper_Eggli_Sandoz process;
+
             for(String url: urls){
-                if(isLocalProcess(url)){
+                if(DA_Schiper_Eggli_Sandoz_main.isLocalProcess(url)){
                     process = new DA_Schiper_Eggli_Sandoz(urls.length, index);
                     new Thread(process).start();
                     Naming.bind(url, process);
@@ -69,10 +66,12 @@ public class TestCase {
             e2.printStackTrace();
         } catch (MalformedURLException e3) {
             e3.printStackTrace();
+        } catch (NotBoundException e4){
+            e4.printStackTrace();
         }
     }
 
-    //@Test
+    @Test
     public void Test1()  throws RemoteException{
         logger.info("Test 1 starts !");
 
@@ -137,6 +136,7 @@ public class TestCase {
     }
 
     @Test
+    @Ignore
     public void Test3()  throws RemoteException{
         logger.info("Test 3 starts !");
         Message message1 = new Message(0, 1, 2000);
