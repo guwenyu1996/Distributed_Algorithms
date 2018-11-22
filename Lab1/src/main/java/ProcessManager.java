@@ -41,30 +41,23 @@ public class ProcessManager {
     public static void startServer() {
         String[] urls = readConfiguration();
 
-        List<DA_Schiper_Eggli_Sandoz_RMI> processes = new ArrayList<DA_Schiper_Eggli_Sandoz_RMI>();
         int index = 0;
 
         try {
-            for (String url : urls) {
+            String url = urls[0];
                 DA_Schiper_Eggli_Sandoz process;
 
-                if(isLocalProcess(url)){
+                    logger.info("create server at" + urls[index]);
                     process = new DA_Schiper_Eggli_Sandoz(urls.length, index);
                     new Thread(process).start();
-                    Naming.bind(url, process);
-                }else
-                    process = (DA_Schiper_Eggli_Sandoz)Naming.lookup(urls[index]);
+                    Naming.bind("rmi://localhost/SES2", process);
 
-                processes.add(process);
-            }
         }catch (RemoteException e1) {
             e1.printStackTrace();
         } catch (AlreadyBoundException e2) {
             e2.printStackTrace();
         } catch (MalformedURLException e3) {
             e3.printStackTrace();
-        } catch (NotBoundException e4){
-            e4.printStackTrace();
         }
     }
 
@@ -91,7 +84,6 @@ public class ProcessManager {
 
     /**
      * Initialize one local process.
-     * @param index the index of process in configuration file
      */
     public static void startClient(int index) {
         try {
