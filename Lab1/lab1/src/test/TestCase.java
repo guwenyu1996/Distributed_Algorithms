@@ -51,9 +51,13 @@ public class TestCase {
 
         try{
             for(String url: urls){
-                DA_Schiper_Eggli_Sandoz process = new DA_Schiper_Eggli_Sandoz(urls.length, index);
-                new Thread(process).start();
-                Naming.bind(url, process);
+                if(isLocalProcess(url)){
+                    process = new DA_Schiper_Eggli_Sandoz(urls.length, index);
+                    new Thread(process).start();
+                    Naming.bind(url, process);
+                }else
+                    process = (DA_Schiper_Eggli_Sandoz)Naming.lookup(urls[index]);
+
                 processes.add(process);
 
                 index ++;
@@ -68,7 +72,7 @@ public class TestCase {
         }
     }
 
-    @Test
+    //@Test
     public void Test1()  throws RemoteException{
         logger.info("Test 1 starts !");
 
@@ -94,7 +98,7 @@ public class TestCase {
         }
     }
 
-    @Test
+    //@Test
     /**
      * P0 sends m1 to P1.
      * P0 sends m2 to P2.
@@ -130,6 +134,22 @@ public class TestCase {
         }catch (InterruptedException e){
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void Test3()  throws RemoteException{
+        logger.info("Test 3 starts !");
+        Message message1 = new Message(0, 1, 2000);
+        message1.setContent("This is message 1");
+
+        processes.get(0).send(1, message1);
+
+        try{
+            Thread.sleep(2000);
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
+
     }
 
 }
