@@ -17,7 +17,7 @@ public class DA_Schiper_Eggli_Sandoz_main {
             System.setSecurityManager(new RMISecurityManager());
         }
 
-        ProcessManager.startServer();
+        ProcessManager.startServer(0);
     }
 
 
