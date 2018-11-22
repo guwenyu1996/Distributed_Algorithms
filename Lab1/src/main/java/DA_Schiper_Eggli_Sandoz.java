@@ -77,7 +77,7 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
         port = new HashMap<Integer, String>();
         processList = new HashMap<Integer, DA_Schiper_Eggli_Sandoz_RMI>();
 
-        String[] urls = DA_Schiper_Eggli_Sandoz_main.readConfiguration();
+        String[] urls = ProcessManager.readConfiguration();
         for(int i = 0; i < urls.length; i ++)
             port.put(i, urls[i]);
 

@@ -4,7 +4,9 @@ import org.apache.log4j.Logger;
 
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
+import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
@@ -21,7 +23,7 @@ public class ProcessManager {
         // initialize node property
         PropertiesConfiguration config = new PropertiesConfiguration();
         try{
-            config.read(new FileReader("src/main/resources/url.properties"));
+            config.read(new FileReader("url.properties"));
         }catch(IOException e1){
             logger.error("Failed to read configurations. Throw by IOException");
             e1.printStackTrace();
@@ -34,7 +36,7 @@ public class ProcessManager {
     }
 
     /**
-     * Initialize three local processes.
+     *
      */
     public static void startServer() {
         String[] urls = readConfiguration();
@@ -66,11 +68,22 @@ public class ProcessManager {
         }
     }
 
-    public static boolean isLocalProcess(String url){
+    public static boolean isLocalProcess(String url) {
+
+        String ipaddress = new String();
+        try{
+            InetAddress IP = InetAddress.getLocalHost();
+            ipaddress = InetAddress.getLocalHost().getHostAddress();
+            logger.info("IP " + ipaddress);
+        }catch (UnknownHostException e){
+            e.printStackTrace();
+        }
 
         if(url.startsWith(prefix + "localhost"))
             return true;
         else if(url.startsWith(prefix + "127.0.0.1"))
+            return true;
+        else if(url.startsWith(prefix + ipaddress))
             return true;
         else
             return false;

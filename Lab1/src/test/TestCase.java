@@ -49,7 +49,7 @@ public class TestCase {
             DA_Schiper_Eggli_Sandoz process;
 
             for(String url: urls){
-                if(DA_Schiper_Eggli_Sandoz_main.isLocalProcess(url)){
+                if(ProcessManager.isLocalProcess(url)){
                     process = new DA_Schiper_Eggli_Sandoz(urls.length, index);
                     new Thread(process).start();
                     Naming.bind(url, process);
