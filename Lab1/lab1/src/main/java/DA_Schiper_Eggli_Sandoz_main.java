@@ -28,12 +28,13 @@ public class DA_Schiper_Eggli_Sandoz_main {
             e2.printStackTrace();
         }
 
-        String[] urls = config.getStringArray("node_url");
-        return urls;
+        return config.getStringArray("node_url");
     }
 
+    /**
+     * Initialize three local processes.
+     */
     public static void start() {
-
         String[] urls = readConfiguration();
 
         List<DA_Schiper_Eggli_Sandoz> processes = new ArrayList<DA_Schiper_Eggli_Sandoz>();
@@ -41,7 +42,6 @@ public class DA_Schiper_Eggli_Sandoz_main {
 
         try {
             for (String url : urls) {
-
                 DA_Schiper_Eggli_Sandoz process;
 
                 if(isLocalProcess(url)){
@@ -52,7 +52,6 @@ public class DA_Schiper_Eggli_Sandoz_main {
                     process = (DA_Schiper_Eggli_Sandoz)Naming.lookup(urls[index]);
 
                 processes.add(process);
-
             }
         }catch (RemoteException e1) {
             e1.printStackTrace();
@@ -89,5 +88,25 @@ public class DA_Schiper_Eggli_Sandoz_main {
         }
 
         start();
+    }
+
+    /**
+     * Initialize one local process.
+     * @param index the index of process in configuration file
+     */
+    public static void localStart(int index) {
+        try {
+            String[] urls = readConfiguration();
+
+            DA_Schiper_Eggli_Sandoz process = new DA_Schiper_Eggli_Sandoz(urls.length, index);
+            new Thread(process).start();
+            Naming.bind(urls[index], process);
+        } catch (RemoteException e1) {
+            e1.printStackTrace();
+        } catch (AlreadyBoundException e2) {
+            e2.printStackTrace();
+        } catch (MalformedURLException e3) {
+            e3.printStackTrace();
+        }
     }
 }
