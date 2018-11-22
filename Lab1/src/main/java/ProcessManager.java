@@ -5,14 +5,16 @@ import org.apache.log4j.Logger;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.rmi.*;
-import java.rmi.registry.LocateRegistry;
+import java.rmi.AlreadyBoundException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DA_Schiper_Eggli_Sandoz_main {
+public class ProcessManager {
 
-    final static Logger logger = Logger.getLogger(DA_Schiper_Eggli_Sandoz_main.class);
+    final static Logger logger = Logger.getLogger(ProcessManager.class);
     private static String prefix = "rmi://";
 
     public static String[] readConfiguration(){
@@ -34,7 +36,7 @@ public class DA_Schiper_Eggli_Sandoz_main {
     /**
      * Initialize three local processes.
      */
-    public static void start() {
+    public static void startServer() {
         String[] urls = readConfiguration();
 
         List<DA_Schiper_Eggli_Sandoz_RMI> processes = new ArrayList<DA_Schiper_Eggli_Sandoz_RMI>();
@@ -74,27 +76,11 @@ public class DA_Schiper_Eggli_Sandoz_main {
             return false;
     }
 
-    public static void main(String args[]) {
-
-        try {
-            LocateRegistry.createRegistry(1099);
-        } catch (RemoteException e) {
-            e.printStackTrace();
-        }
-
-        // Create and install a security manager
-        if (System.getSecurityManager() == null) {
-            System.setSecurityManager(new RMISecurityManager());
-        }
-
-        localStart(0);
-    }
-
     /**
      * Initialize one local process.
      * @param index the index of process in configuration file
      */
-    public static void localStart(int index) {
+    public static void startClient(int index) {
         try {
             String[] urls = readConfiguration();
 

@@ -22,6 +22,7 @@ public class TestCase {
     List<DA_Schiper_Eggli_Sandoz> processes = new ArrayList<DA_Schiper_Eggli_Sandoz>();
 
     @Before
+    @Ignore
     public void Initialize(){
 
         File directory = new File("");
@@ -72,6 +73,7 @@ public class TestCase {
     }
 
     @Test
+    @Ignore
     public void Test1()  throws RemoteException{
         logger.info("Test 1 starts !");
 
@@ -97,12 +99,14 @@ public class TestCase {
         }
     }
 
-    //@Test
+
     /**
      * P0 sends m1 to P1.
      * P0 sends m2 to P2.
      * P2 sends m3 to P1, which arrives earlier than m1.
      */
+    @Test
+    @Ignore
     public void Test2()  throws RemoteException{
         logger.info("Test 1 starts !");
 
