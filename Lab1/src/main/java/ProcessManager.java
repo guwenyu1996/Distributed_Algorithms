@@ -38,19 +38,14 @@ public class ProcessManager {
     /**
      *
      */
-    public static void startServer() {
+    public static void startServer(int index) {
         String[] urls = readConfiguration();
 
-        int index = 0;
-
         try {
-            String url = urls[0];
-                DA_Schiper_Eggli_Sandoz process;
-
-                    logger.info("create server at" + urls[index]);
-                    process = new DA_Schiper_Eggli_Sandoz(urls.length, index);
-                    new Thread(process).start();
-                    Naming.bind("rmi://localhost/SES2", process);
+            DA_Schiper_Eggli_Sandoz process = new DA_Schiper_Eggli_Sandoz(urls.length, index);
+            logger.info("create server at" + urls[index]);
+            new Thread(process).start();
+            Naming.bind("rmi://localhost/SES", process);
 
         }catch (RemoteException e1) {
             e1.printStackTrace();
@@ -61,11 +56,11 @@ public class ProcessManager {
         }
     }
 
+
     public static boolean isLocalProcess(String url) {
 
         String ipaddress = new String();
         try{
-            InetAddress IP = InetAddress.getLocalHost();
             ipaddress = InetAddress.getLocalHost().getHostAddress();
             logger.info("IP " + ipaddress);
         }catch (UnknownHostException e){
@@ -80,24 +75,5 @@ public class ProcessManager {
             return true;
         else
             return false;
-    }
-
-    /**
-     * Initialize one local process.
-     */
-    public static void startClient(int index) {
-        try {
-            String[] urls = readConfiguration();
-
-            DA_Schiper_Eggli_Sandoz process = new DA_Schiper_Eggli_Sandoz(urls.length, index);
-            new Thread(process).start();
-            Naming.bind(urls[index], process);
-        } catch (RemoteException e1) {
-            e1.printStackTrace();
-        } catch (AlreadyBoundException e2) {
-            e2.printStackTrace();
-        } catch (MalformedURLException e3) {
-            e3.printStackTrace();
-        }
     }
 }

@@ -271,7 +271,7 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
     }
 
     public void test() throws RemoteException{
-        logger.warn("RMI - Process " + index);
+        logger.warn("Test - Process " + index);
     }
 
 }

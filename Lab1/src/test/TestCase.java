@@ -142,6 +142,7 @@ public class TestCase {
     }
 
     @Test
+    @Ignore
     public void Test3()  throws RemoteException{
         logger.info("Test 3 starts !");
         DA_Schiper_Eggli_Sandoz_RMI process =null;
@@ -167,6 +168,45 @@ public class TestCase {
             e4.printStackTrace();
         }
         process.test();
+
+    }
+
+    @Test
+    public void test4() throws RemoteException{
+
+        try {
+            LocateRegistry.createRegistry(1099);
+        } catch (RemoteException e) {
+            e.printStackTrace();
+        }
+
+        // Create and install a security manager
+        if (System.getSecurityManager() == null) {
+            System.setSecurityManager(new RMISecurityManager());
+        }
+
+        Message message1 = new Message(0, 1, 0);
+        message1.setContent("This is message 1");
+
+        processes.get(0).send(1, message1);
+
+        Message message2 = new Message(0, 2, 100);
+        message2.setContent("This is message 2");
+
+        processes.get(0).send(2, message2);
+
+        Message message3 = new Message(2, 1, 300);
+        message3.setContent("This is message 3");
+
+        processes.get(2).send(1, message3);
+        logger.warn("Message 3 send");
+        try{
+            Thread.sleep(2000);
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
+
+
 
     }
 
