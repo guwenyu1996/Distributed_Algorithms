@@ -4,15 +4,10 @@ import org.apache.log4j.Logger;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.MalformedURLException;
-import java.net.UnknownHostException;
 import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
-import java.util.ArrayList;
-import java.util.List;
 
 public class ProcessManager {
 
@@ -57,26 +52,5 @@ public class ProcessManager {
         } catch (MalformedURLException e3) {
             e3.printStackTrace();
         }
-    }
-
-
-    public static boolean isLocalProcess(String url) {
-
-        String ipaddress = new String();
-        try{
-            ipaddress = InetAddress.getLocalHost().getHostAddress();
-            logger.info("IP " + ipaddress);
-        }catch (UnknownHostException e){
-            e.printStackTrace();
-        }
-
-        if(url.startsWith(prefix + "localhost"))
-            return true;
-        else if(url.startsWith(prefix + "127.0.0.1"))
-            return true;
-        else if(url.startsWith(prefix + ipaddress))
-            return true;
-        else
-            return false;
     }
 }

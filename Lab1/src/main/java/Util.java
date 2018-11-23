@@ -1,6 +1,9 @@
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Some static methods used in this project
+ */
 public class Util {
 
     public static List<Integer> copyList(List<Integer> list){

@@ -24,6 +24,9 @@ public class TestCase {
     List<DA_Schiper_Eggli_Sandoz_RMI> processes = new ArrayList<DA_Schiper_Eggli_Sandoz_RMI>();
 
     @Before
+    /**
+     * Create interface to invoke method on other servers
+     */
     public void Initialize(){
 
         File directory = new File("");
@@ -72,6 +75,11 @@ public class TestCase {
 
     @Test
     @Ignore
+    /**Sending the message following the sequence, nothing special
+     * Step1: P0 sends m1 to P1,
+     * Step2: P0 sends m2 to P2.
+     * Step3: P2 sends m3 to P1,.
+     */
     public void Test1()  throws RemoteException{
         logger.info("Test 1 starts !");
 
@@ -98,13 +106,12 @@ public class TestCase {
     }
 
 
-    /**
-     * P0 sends m1 to P1.
-     * P0 sends m2 to P2.
-     * P2 sends m3 to P1, which arrives earlier than m1.
+    /**Test whether the message is delivered following the casual order
+     * Step1: P0 sends m1 to P1, but the receiving of this message will be delays
+     * Step2: P0 sends m2 to P2.
+     * Step3: P2 sends m3 to P1, which arrives earlier than m1.
      */
     @Test
-    @Ignore
     public void Test2()  throws RemoteException{
         logger.info("Test 2 starts !");
 
@@ -143,6 +150,9 @@ public class TestCase {
 
     @Test
     @Ignore
+    /**
+     * Test whether a server can send message to itself
+     */
     public void Test3()  throws RemoteException{
         logger.info("Test 3 starts !");
         DA_Schiper_Eggli_Sandoz_RMI process =null;
@@ -172,6 +182,10 @@ public class TestCase {
     }
 
     @Test
+    @Ignore
+    /**
+     * Test whether a server can clean its timestamp and buffer
+     */
     public void Test4()  throws RemoteException {
         logger.info("Test 4 starts !");
 

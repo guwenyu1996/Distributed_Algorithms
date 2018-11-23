@@ -60,9 +60,9 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
     final static Logger logger = Logger.getLogger(DA_Schiper_Eggli_Sandoz.class);
 
     /**
-     *
-     * @param processNum
-     * @param index
+     * Constructor
+     * @param processNum Number of servers in the system
+     * @param index Index of this server
      */
     public DA_Schiper_Eggli_Sandoz(int processNum, int index) throws RemoteException{
         this.index =index;
@@ -86,7 +86,10 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
     }
 
     /**
-     * {@inheritDoc}
+     * Send a message to any server in this system (including current server), should be only invoked by controller
+     * @param destId index of the destination server
+     * @param message message to be sent
+     * @throws RemoteException
      */
     public void send(int destId, Message message) throws RemoteException{
 
@@ -121,7 +124,9 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
     }
 
     /**
-     * {@inheritDoc}
+     * Receive a message from any server in this system (including current server)
+     * @param message message to receive
+     * @throws RemoteException
      */
     public synchronized void receive(Message message) throws RemoteException{
 
@@ -144,8 +149,12 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
             logger.info("P" + message.getDestId() + " postpone a message from P" + message.getSrcId() +
                     " with buffer " + message.getBuffer() + " at current state " + ts);
         }
-
     }
+
+    /**
+     * Clear the ts and buffer for this server
+     * @throws RemoteException
+     */
     public void clear() throws RemoteException{
         ts = new ArrayList<Integer>();
         for(int i = 0; i < processNum; i ++)
