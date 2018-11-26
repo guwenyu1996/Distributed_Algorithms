@@ -1,5 +1,3 @@
-
-
 import org.apache.log4j.Logger;
 
 import java.net.MalformedURLException;
@@ -54,14 +52,17 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
      */
     private Map<Integer, DA_Schiper_Eggli_Sandoz_RMI> processList;
 
-    private Map<Integer, String> port; //map each node with its port number
+    /**
+     * Map of url of remote process and its process index.
+     */
+    private Map<Integer, String> port;
 
     final static Logger logger = Logger.getLogger(DA_Schiper_Eggli_Sandoz.class);
 
     /**
-     *
-     * @param processNum
-     * @param index
+     * Constructor
+     * @param processNum Number of servers in the system
+     * @param index Index of this server
      */
     public DA_Schiper_Eggli_Sandoz(int processNum, int index) throws RemoteException{
         this.index =index;
@@ -76,7 +77,7 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
         port = new HashMap<Integer, String>();
         processList = new HashMap<Integer, DA_Schiper_Eggli_Sandoz_RMI>();
 
-        String[] urls = DA_Schiper_Eggli_Sandoz_main.readConfiguration();
+        String[] urls = ProcessManager.readConfiguration();
         for(int i = 0; i < urls.length; i ++)
             port.put(i, urls[i]);
 
@@ -85,9 +86,9 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
     }
 
     /**
-     *
-     * @param destId
-     * @param message
+     * Send a message to any server in this system (including current server), should be only invoked by controller
+     * @param destId index of the destination server
+     * @param message message to be sent
      * @throws RemoteException
      */
     public void send(int destId, Message message) throws RemoteException{
@@ -123,7 +124,9 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
     }
 
     /**
-     * {@inheritDoc}
+     * Receive a message from any server in this system (including current server)
+     * @param message message to receive
+     * @throws RemoteException
      */
     public synchronized void receive(Message message) throws RemoteException{
 
@@ -137,7 +140,7 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
 
             // check the message in pending list could be delivered
             Message temp = null;
-            while((temp = checkPendingList(temp)) != null){
+            while((temp = checkPendingList()) != null){
                 deliver(temp);
                 pendingMessage.remove(temp);
             }
@@ -146,16 +149,29 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
             logger.info("P" + message.getDestId() + " postpone a message from P" + message.getSrcId() +
                     " with buffer " + message.getBuffer() + " at current state " + ts);
         }
+    }
 
+    /**
+     * Clear the ts and buffer for this server
+     * @throws RemoteException
+     */
+    public void clear() throws RemoteException{
+        ts = new ArrayList<Integer>();
+        for(int i = 0; i < processNum; i ++)
+            ts.add(0);
+        localBuffer = new HashMap<Integer, List<Integer>>();
+        receivedMessage = new ArrayList<Message>();
+        pendingMessage = new ArrayList<Message>();
+        deliveredMessage = new ArrayList<Message>();
+        logger.info(" current buffer " + this.localBuffer + "  current ts " + ts);
     }
 
     /**
      * Check whether there exists a message in pending list could be delivered.
-     * @param message the pointer to message could be delivered
-     * @return true if the message could be delivered right away
-     *         false if all messages in pending list could not delivered
+     * @return Message if the message could be delivered right away
+     *         null if all messages in pending list could not delivered
      */
-    private Message checkPendingList(Message message){
+    private Message checkPendingList(){
 
         for(Message msg: pendingMessage){
             if(isDeliveryReady(msg)){
@@ -185,7 +201,7 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
     }
 
     /**
-     *
+     * Process a message.
      * @param message
      */
     private void processMessage(Message message){
@@ -273,5 +289,8 @@ public class DA_Schiper_Eggli_Sandoz extends UnicastRemoteObject
         logger.info("Run process " + index);
     }
 
+    public void test() throws RemoteException{
+        logger.warn("Test - Process " + index);
+    }
 
 }
