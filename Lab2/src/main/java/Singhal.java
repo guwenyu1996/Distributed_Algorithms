@@ -8,6 +8,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+
 public class Singhal extends UnicastRemoteObject implements Singhal_RMI, Runnable{
 
     /**
@@ -21,9 +22,9 @@ public class Singhal extends UnicastRemoteObject implements Singhal_RMI, Runnabl
     private int index;
 
     /**
-     * the arrary to store the state of all processes
+     * the arrary to store the State of all processes
      */
-    private List<state> state_array =new LinkedList<state>();
+    private List<State> state_array =new LinkedList<State>();
 
     private List<Integer> request_number =new LinkedList<Integer>();
 
@@ -42,6 +43,7 @@ public class Singhal extends UnicastRemoteObject implements Singhal_RMI, Runnabl
     public Singhal(int processNum, int index) throws RemoteException {
         this.processNum = processNum;
         this.index = index;
+ 
         ///initialize the state array
         if(index == 0){
             state_array.add(state.H);
@@ -89,13 +91,13 @@ public class Singhal extends UnicastRemoteObject implements Singhal_RMI, Runnabl
      * @param token the token to be received
      */
     public void receiveToken(Token token) throws RemoteException {
-        state_array.set(index, state.E);
+        state_array.set(index, State.E);
 
         CS();
 
-        state_array.set(index, state.O);
+        state_array.set(index, State.O);
 
-        token.setTS(index, state.O);
+        token.setTS(index, State.O);
 
         for(int i =0;i<processNum;i++){
             if(this.request_number.get(i)<token.getTN().get(i)){
@@ -108,7 +110,7 @@ public class Singhal extends UnicastRemoteObject implements Singhal_RMI, Runnabl
         }
 
         if(checkState()==-1){
-            this.state_array.set(index, state.H);
+            this.state_array.set(index, State.H);
         }else{
             sendToken(checkState(),token);
         }
@@ -116,12 +118,12 @@ public class Singhal extends UnicastRemoteObject implements Singhal_RMI, Runnabl
     }
 
     /**
-     * check whether there is a state R, if there is, return the position, else return -1
+     * check whether there is a State R, if there is, return the position, else return -1
      * @return
      */
     private int checkState(){
         for(int i=0;i<processNum;i++){
-            if(this.state_array.get(i)==state.R){
+            if(this.state_array.get(i)==State.R){
                 return i;
             }
         }
@@ -130,19 +132,58 @@ public class Singhal extends UnicastRemoteObject implements Singhal_RMI, Runnabl
 
 
     /**
-     * send a request to the destination
-     * @param des index of destination
+     * send a request
      */
-    public  void sendRequest(int des) throws RemoteException {
+    public void sendRequest() throws RemoteException {
 
+        this.state_array.set(index, State.R);
+        this.request_number.set(index, request_number.get(index) + 1);
+
+        for(int i = 0; i < processNum; i ++){
+            if(i == index)
+                continue;
+
+            if(state_array.get(i) == State.R)
+                processList.get(i).receiveRequest(index, request_number.get(index));
+        }
     }
+
+
 
     /**
      * receive a request
-     * @param src index of source process
-     * @param r request number
+     * @param srcId index of source process
+     * @param reqNum request number
      */
-    public void receiveRequest(int src, int r) throws RemoteException {
+    public void receiveRequest(int srcId, int reqNum) throws RemoteException {
+        request_number.set(srcId, reqNum);
+
+        switch (state_array.get(index)){
+            case O:{
+                state_array.set(srcId, State.R);
+                break;
+            }
+            case E:{
+                state_array.set(srcId, State.R);
+                break;
+            }
+            case R:{
+                if(state_array.get(srcId) != State.R){
+                    state_array.set(srcId, State.R);
+                    processList.get(srcId).receiveRequest(index, request_number.get(index));
+                }
+            }
+            case H:{
+                state_array.set(srcId, State.R);
+                state_array.set(srcId, State.O);
+
+                Token token = new Token();
+                token.setTN(request_number);
+                token.setTS(state_array);
+
+                sendToken(srcId, token);
+            }
+        }
 
     }
 
