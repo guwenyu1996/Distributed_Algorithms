@@ -43,20 +43,23 @@ public class Singhal extends UnicastRemoteObject implements Singhal_RMI, Runnabl
     public Singhal(int processNum, int index) throws RemoteException {
         this.processNum = processNum;
         this.index = index;
-        ///initialize the State array
-        for(int i =0;i<processNum;i++){
-            if(i<=index){
-                if(index == 0){
-                    state_array.add(State.H);
-                }else{
-                    state_array.add(State.R);
-                }
-            }else{
-                state_array.add(State.O);
+ 
+        ///initialize the state array
+        if(index == 0){
+            state_array.add(state.H);
+            for(int i=1;i<processNum;i++){
+                state_array.add(state.O);
             }
-
-            request_number.add(0);
+        }else{
+            for(int i=0;i<processNum;i++){
+                if(i<index){
+                    state_array.add(state.R);
+                }else{
+                    state_array.add(state.O);
+                }
+            }
         }
+
     }
 
 
