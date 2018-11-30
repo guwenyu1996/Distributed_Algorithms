@@ -10,8 +10,21 @@ public class Token {
         this.TN = TN;
     }
 
+    /**
+     *
+     * @param index the index to assert number
+     * @param num number of requests
+     */
+    public void setTN(int index, Integer num) {
+        this.TN.set(index, num);
+    }
+
     public void setTS(List<state> TS) {
         this.TS = TS;
+    }
+
+    public void setTS(int index,state state0) {
+        this.TS.set(index,state0);
     }
 
     public List<Integer> getTN() {
@@ -21,4 +34,6 @@ public class Token {
     public List<state> getTS() {
         return TS;
     }
+
+
 }
