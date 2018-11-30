@@ -9,7 +9,7 @@ public interface Singhal_RMI extends Remote{
 
     void receiveToken(Token token) throws RemoteException ;
 
-    void sendRequest(int des) throws RemoteException ;
+    void sendRequest() throws RemoteException ;
 
     void receiveRequest(int src, int r) throws RemoteException ;
 
