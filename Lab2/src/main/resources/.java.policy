@@ -1,0 +1,5 @@
+grant {
+    permission java.security.AllPermission;
+    permission java.lang.RuntimePermission "setContextClassLoader";
+    permission java.util.PropertyPermission "*", "read,write";
+};

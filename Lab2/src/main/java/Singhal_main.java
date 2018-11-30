@@ -15,6 +15,6 @@ public class Singhal_main {
             System.setSecurityManager(new RMISecurityManager());
         }
 
-        ProcessManager.startServer(0);
+        ProcessManager.startServer(1);
     }
 }

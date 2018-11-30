@@ -73,7 +73,7 @@ public class testCase {
 
     @Test
     public void test1() throws RemoteException{
-        processes.get(0).runCS();
-        processes.get(1).runCS();
+        processes.get(0).requestCS();
+        processes.get(1).requestCS();
     }
 }

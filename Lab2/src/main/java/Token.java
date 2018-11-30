@@ -1,15 +1,19 @@
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
-public class Token {
+public class Token implements Serializable {
 
     private List<Integer> TN;
 
     private List<State> TS;
 
+    private List<Singhal_RMI> queue;
+
     public Token(){
         TN = new LinkedList<Integer>();
         TS =new LinkedList<State>();
+        queue = new LinkedList<Singhal_RMI>();
     }
 
     public void setTN(List<Integer> TN) {

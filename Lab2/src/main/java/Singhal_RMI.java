@@ -13,8 +13,8 @@ public interface Singhal_RMI extends Remote{
 
     void receiveRequest(int src, int r) throws RemoteException ;
 
-    void runCS() throws RemoteException ;
+    void requestCS() throws RemoteException;
 
-    void CS() throws RemoteException ;
+    void proessToken(Token token) throws RemoteException;
 
 }
