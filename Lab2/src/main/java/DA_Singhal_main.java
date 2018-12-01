@@ -1,7 +1,7 @@
 import java.rmi.*;
 import java.rmi.registry.LocateRegistry;
 
-public class Singhal_main {
+public class DA_Singhal_main {
     public static void main(String args[]) {
 
         try {

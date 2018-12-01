@@ -2,7 +2,7 @@ import java.rmi.Remote;
 import java.rmi.RemoteException;
 
 
-public interface Singhal_RMI extends Remote{
+public interface DA_Singhal_RMI extends Remote{
 
 
     void sendToken (int desId, Token token) throws RemoteException ;
@@ -15,6 +15,6 @@ public interface Singhal_RMI extends Remote{
 
     void requestCS() throws RemoteException;
 
-    void proessToken(Token token) throws RemoteException;
+    void processToken(Token token) throws RemoteException;
 
 }

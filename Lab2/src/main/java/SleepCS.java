@@ -2,11 +2,11 @@ import org.apache.log4j.Logger;
 import java.rmi.RemoteException;
 
 public class SleepCS implements Runnable{
-    private Singhal_RMI singhal;
+    private DA_Singhal_RMI singhal;
     private Token token;
-    final static Logger logger = Logger.getLogger(Singhal.class);
+    final static Logger logger = Logger.getLogger(DA_Singhal.class);
 
-    public SleepCS(Singhal_RMI singhal, Token token){
+    public SleepCS(DA_Singhal_RMI singhal, Token token){
         this.singhal = singhal;
         this.token=token;
     }

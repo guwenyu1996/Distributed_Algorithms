@@ -10,7 +10,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-public class Singhal extends UnicastRemoteObject implements Singhal_RMI, Runnable{
+public class DA_Singhal extends UnicastRemoteObject implements DA_Singhal_RMI, Runnable{
 
     /**
      * The total number of process in the system
@@ -32,18 +32,18 @@ public class Singhal extends UnicastRemoteObject implements Singhal_RMI, Runnabl
     /**
      * List of all servers in the system
      */
-    private Map<Integer, Singhal_RMI> processList;
+    private Map<Integer, DA_Singhal_RMI> processList;
 
 
-    private List<Singhal_RMI> queue;
+    private List<DA_Singhal_RMI> queue;
     /**
      * Map of url of remote process and its process index.
      */
     private Map<Integer, String> port;
 
-    final static Logger logger = Logger.getLogger(Singhal.class);
+    final static Logger logger = Logger.getLogger(DA_Singhal.class);
 
-    public Singhal(int processNum, int index) throws RemoteException {
+    public DA_Singhal(int processNum, int index) throws RemoteException {
         this.processNum = processNum;
         this.index = index;
  
@@ -67,7 +67,7 @@ public class Singhal extends UnicastRemoteObject implements Singhal_RMI, Runnabl
             request_number.add(0);
         }
 
-        processList = new HashMap<Integer, Singhal_RMI>();
+        processList = new HashMap<Integer, DA_Singhal_RMI>();
         port = new HashMap<Integer, String>();
         String[] urls = ProcessManager.readConfiguration();
         for(int i = 0; i < urls.length; i ++)
@@ -76,8 +76,10 @@ public class Singhal extends UnicastRemoteObject implements Singhal_RMI, Runnabl
 
 
     /**
-     * send a token to destination
-     * @param desId index of destination
+     * Grant permission to a targeted process by sending a token
+     * @param desId
+     * @param token
+     * @throws RemoteException
      */
     public void sendToken (int desId, Token token) throws RemoteException {
         checkProcess(desId);
@@ -101,54 +103,51 @@ public class Singhal extends UnicastRemoteObject implements Singhal_RMI, Runnabl
         logger.info("exit receiveToken" + "state array:" + this.state_array + "request numbers "+ this.request_number);
     }
 
-    public void proessToken(Token token) throws RemoteException{
-        logger.info("into proessToken" + "state array:" + this.state_array + "request numbers "+ this.request_number);
+    /**
+     * Process a token
+     * @param token
+     * @throws RemoteException
+     */
+    public void processToken(Token token) throws RemoteException{
+        logger.info("into processToken" + "state array:" + this.state_array + "request numbers "+ this.request_number);
 
         state_array.set(index, State.E);
 
         CS();
 
         state_array.set(index, State.O);
-
         token.setTS(index, State.O);
 
-        for(int i =0;i<processNum;i++){
-            if(this.request_number.get(i)>token.getTN().get(i)){
-                token.setTN(i,this.request_number.get(i));
+        // update knowledge for both token and process
+        for(int i = 0; i < processNum; i ++){
+            if(this.request_number.get(i) > token.getTN().get(i)){
+                token.setTN(i, this.request_number.get(i));
                 token.setTS(i, this.state_array.get(i));
+
+                // update knowledge for waiting list of token
+                if(state_array.get(i) == State.R)
+                    token.addPossibleOwner(i);
             }else{
-                this.request_number.set(i,token.getTN().get(i));
-                this.state_array.set(i,token.getTS().get(i));
+                this.request_number.set(i, token.getTN().get(i));
+                this.state_array.set(i, token.getTS().get(i));
             }
         }
 
-        if(checkState()==-1){
+        // update information for waiting list for token
+        int next = token.retrieveNextOwner();
+        if(next == -1){
             this.state_array.set(index, State.H);
         }else{
-            sendToken(checkState(),token);
+            sendToken(next, token);
         }
-        logger.info("exit proessToken" + "state array:" + this.state_array + "request numbers "+ this.request_number);
+        logger.info("exit processToken" + "state array:" + this.state_array + "request numbers "+ this.request_number);
     }
 
     /**
-     * check whether there is a State R, if there is, return the position, else return -1
-     * @return
-     */
-    private int checkState(){
-        for(int i=0;i<processNum;i++){
-            if(this.state_array.get(i)==State.R){
-                return i;
-            }
-        }
-        return -1;
-    }
-
-
-    /**
-     * send a request
+     * Send requests to processes that might hold the token
      */
     public void sendRequest() throws RemoteException {
-        logger.info("into into send request" + "state array:" + this.state_array + "request numbers "+ this.request_number);
+        logger.info("into send request" + " state:" + this.state_array + " reqNum "+ this.request_number);
 
         this.state_array.set(index, State.R);
         this.request_number.set(index, request_number.get(index) + 1);
@@ -162,13 +161,18 @@ public class Singhal extends UnicastRemoteObject implements Singhal_RMI, Runnabl
                 checkProcess(i);
                 processList.get(i).receiveRequest(index, request_number.get(index));
             }
-
         }
-        logger.info("exit into send request" + "state array:" + this.state_array + "request numbers "+ this.request_number);
+
+        logger.info("exit send request" + " state:" + this.state_array + " reqNum "+ this.request_number);
     }
 
+    /**
+     * The entry function for requesting permissions
+     * @throws RemoteException
+     */
     public void requestCS() throws RemoteException{
         Token token_temp = new Token();
+
         if(this.state_array.get(index) == State.H) {
             token_temp.setTN(this.request_number);
             token_temp.setTS(this.state_array);
@@ -186,7 +190,7 @@ public class Singhal extends UnicastRemoteObject implements Singhal_RMI, Runnabl
      * @param reqNum request number
      */
     public void receiveRequest(int srcId, int reqNum) throws RemoteException {
-        logger.info("into receiveRequest" + "state array:" + this.state_array + "request numbers "+ this.request_number);
+        logger.info("into receiveRequest" + "state :" + this.state_array + "reqNum "+ this.request_number);
 
         request_number.set(srcId, reqNum);
 
@@ -219,10 +223,13 @@ public class Singhal extends UnicastRemoteObject implements Singhal_RMI, Runnabl
             }
         }
 
-        logger.info("exit receiveRequest" + "state array:" + this.state_array + "request numbers "+ this.request_number);
+        logger.info("exit receiveRequest" + "state array:" + this.state_array + "req Num "+ this.request_number);
     }
 
 
+    /**
+     * Critical section
+     */
     public void CS(){
         logger.info("Process" + index+" enters the critical section ");
         try{
@@ -233,11 +240,15 @@ public class Singhal extends UnicastRemoteObject implements Singhal_RMI, Runnabl
         logger.info("Process" + index+" exits the critical section ");
     }
 
+    /**
+     * Check whether the reference to remote process has been initialized or not
+     * @param index the index of process
+     */
     private void checkProcess(int index){
         //if the process of index node is not initialized, initialize it
         if(!processList.containsKey(index)){
             try {
-                Singhal_RMI newProcess = (Singhal_RMI) Naming.lookup(port.get(index));
+                DA_Singhal_RMI newProcess = (DA_Singhal_RMI) Naming.lookup(port.get(index));
                 processList.put(index, newProcess);
             } catch (RemoteException e1) {
                 e1.printStackTrace();
@@ -254,10 +265,6 @@ public class Singhal extends UnicastRemoteObject implements Singhal_RMI, Runnabl
      */
     public void run() {
         logger.info("Run process " + index);
-    }
-
-    public void test() throws RemoteException{
-        logger.warn("Test - Process " + index);
     }
 
 
