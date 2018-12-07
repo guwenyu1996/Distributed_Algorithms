@@ -10,19 +10,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.rmi.*;
-import java.rmi.AlreadyBoundException;
 import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.util.ArrayList;
 import java.util.List;
-import java.rmi.registry.LocateRegistry;
 
 public class testCase {
 
     final static Logger logger = Logger.getLogger(testCase.class);
-    List<Singhal_RMI> processes = new ArrayList<Singhal_RMI>();
+    List<DA_Singhal_RMI> processes = new ArrayList<DA_Singhal_RMI>();
 
 
     @Before
@@ -48,10 +46,10 @@ public class testCase {
         try{
             LocateRegistry.createRegistry(1099);
 
-            Singhal_RMI process;
+            DA_Singhal_RMI process;
 
             for(String url: urls){
-                process = (Singhal_RMI)Naming.lookup(urls[index]);
+                process = (DA_Singhal_RMI)Naming.lookup(urls[index]);
                 processes.add(process);
                 index ++;
             }
@@ -72,8 +70,18 @@ public class testCase {
     }
 
     @Test
+    @Ignore
     public void test1() throws RemoteException{
-        processes.get(0).runCS();
-        processes.get(1).runCS();
+        processes.get(0).requestCS();
+        processes.get(1).requestCS();
     }
+
+    @Test
+    public void test2() throws RemoteException{
+        processes.get(0).requestCS();
+        processes.get(1).requestCS();
+        processes.get(2).requestCS();
+        processes.get(3).requestCS();
+    }
+
 }

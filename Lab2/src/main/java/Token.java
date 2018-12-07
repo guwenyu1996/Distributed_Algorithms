@@ -1,15 +1,18 @@
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
-public class Token {
+public class Token implements Serializable {
 
     private List<Integer> TN;
-
     private List<State> TS;
+    private Queue<Integer> queue;
 
     public Token(){
         TN = new LinkedList<Integer>();
         TS =new LinkedList<State>();
+        queue = new LinkedList<Integer>();
     }
 
     public void setTN(List<Integer> TN) {
@@ -19,11 +22,6 @@ public class Token {
             this.TN.add(new Integer(i));
     }
 
-    /**
-     *
-     * @param index the index to assert number
-     * @param num number of requests
-     */
     public void setTN(int index, Integer num) {
         this.TN.set(index, num);
     }
@@ -51,6 +49,27 @@ public class Token {
 
     public List<State> getTS() {
         return TS;
+    }
+
+    /**
+     * Get the owner of token in next round
+     * @return the index of process
+     *         -1 if queue is empty
+     */
+    public int retrieveNextOwner(){
+        if (queue.isEmpty())
+            return -1;
+        else
+            return queue.poll();
+    }
+
+    /**
+     * Add possible owner of token into waiting queue
+     * @param index
+     */
+    public void addPossibleOwner(int index){
+        if (!queue.contains(index))
+           queue.add(index);
     }
 
 

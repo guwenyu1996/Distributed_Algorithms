@@ -40,7 +40,7 @@ public class ProcessManager {
         String[] urls = readConfiguration();
 
         try {
-            Singhal process = new Singhal(urls.length, index);
+            DA_Singhal process = new DA_Singhal(urls.length, index);
             logger.info("create server at" + urls[index]);
             new Thread(process).start();
             Naming.bind("rmi://localhost/SES", process);
