@@ -2,6 +2,7 @@ import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -69,8 +70,18 @@ public class testCase {
     }
 
     @Test
+    @Ignore
     public void test1() throws RemoteException{
         processes.get(0).requestCS();
         processes.get(1).requestCS();
     }
+
+    @Test
+    public void test2() throws RemoteException{
+        processes.get(0).requestCS();
+        processes.get(1).requestCS();
+        processes.get(2).requestCS();
+        processes.get(3).requestCS();
+    }
+
 }

@@ -14,7 +14,7 @@ public class SleepCS implements Runnable{
 
     public void run(){
         try{
-            singhal.proessToken(token);
+            singhal.processToken(token);
         }catch (RemoteException e){
             e.printStackTrace();
         }

@@ -190,8 +190,8 @@ public class DA_Singhal extends UnicastRemoteObject implements DA_Singhal_RMI, R
      * @param reqNum request number
      */
     public void receiveRequest(int srcId, int reqNum) throws RemoteException {
-        logger.info("into receiveRequest" + "state :" + this.state_array + "reqNum "+ this.request_number);
-
+        logger.info("into receiveRequest from "+ srcId + " state :" + this.state_array + "reqNum "+ this.request_number);
+        checkProcess(srcId);
         request_number.set(srcId, reqNum);
 
         switch (state_array.get(index)){

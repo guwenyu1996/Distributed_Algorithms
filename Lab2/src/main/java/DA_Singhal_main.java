@@ -15,6 +15,6 @@ public class DA_Singhal_main {
             System.setSecurityManager(new RMISecurityManager());
         }
 
-        ProcessManager.startServer(1);
+        ProcessManager.startServer(0);
     }
 }
