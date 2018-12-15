@@ -5,4 +5,8 @@
 public class Connect_massage {
     int src;
     int level;
+    public Connect_massage(int src, int level){
+        this.src = src;
+        this.level = level;
+    }
 }
