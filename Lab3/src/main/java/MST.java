@@ -71,7 +71,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
      */
     private Map<Integer, NeighbourNode> SE;
 
-    private Queue<Connect_massage> connect_queue;
+    private Queue<Message> queue;
 
 
     final static Logger logger = Logger.getLogger(MST.class);
@@ -80,7 +80,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         this.processNum = processNum;
         this.index = index;
         SE = new HashMap<Integer, NeighbourNode>();
-        connect_queue = new LinkedList<Connect_massage>();
+        queue = new LinkedList<Message>();
     }
 
 
@@ -104,7 +104,6 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
     public void receive_initiate(int src, int level, int fragment_name, State_node s) throws RemoteException{
         LN = level;
         FN = fragment_name;
-        // fixme do we need to update state here?
         SN = s;
         in_branch = src;
         best_edge = NIL;
@@ -163,24 +162,27 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         if(SN == State_node.Sleeping)
             wakeup();
 
-        if(level <= LN){ // absorb
+        if(level > LN){
+            Message msg = new Message(MessageType.TEST, src);
+            msg.setLevel(level);
+            msg.setFragment(fragment_name);
+            queue.add(msg);
+        }else{ // absorb
             // absorb subtree which is not in same fragment
             if(fragment_name != FN)
                 SE.get(src).getNode().receive_accept(index);
 
-            // Reject if neighbour node is in same fragment
+                // Reject if neighbour node is in same fragment
             else{
                 if(SE.get(src).getSE() == State_edge.P_in_MST)
                     SE.get(src).setSE(State_edge.Not_in_MST);
 
                 if(test_edge != src)
                     SE.get(src).getNode().receive_reject(index);
-                else // fixme why test here??
+                else
                     test();
             }
         }
-        // fixme adding queue here??
-
     }
 
     /**
@@ -193,7 +195,6 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
             best_weight = propose;
             best_edge = src;
         }
-        // fixme when to update fragment for absorbed tree
         report();
     }
 
@@ -232,6 +233,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
                 halt = true;
             }
         }
+        // fixme add message in a queue?
     }
 
     /**
@@ -275,7 +277,9 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         }else{
             // merge two subtrees
             if(SE.get(src).getSE() == State_edge.P_in_MST){
-                //append message to queue, but in practice we think we do not need to
+                Message msg = new Message(MessageType.CONNECT, index);
+                msg.setLevel(LN);
+                queue.add(msg);
             }else{
                 //use the weight of the common edge as the fragment name
                 SE.get(src).getNode().receive_initiate(this.index, this.LN +1, this.SE.get(src).getWeight(), State_node.Find);
@@ -335,5 +339,19 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
 
     public State_node getSN() {
         return SN;
+    }
+
+
+    private void handleQueue() throws RemoteException{
+
+        for(int i = 0; i < queue.size(); i ++){
+            Message msg = queue.poll();
+
+            switch(msg.getType()){
+                case CONNECT: receive_connect(msg.getSrc(), msg.getLevel()); break;
+                case TEST: receive_test(msg.getSrc(), msg.getLevel(), msg.getFragment()); break;
+                case REPORT: receive_report(msg.getSrc(), msg.getWeight()); break;
+            }
+        }
     }
 }
