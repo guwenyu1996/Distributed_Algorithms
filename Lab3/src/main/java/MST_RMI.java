@@ -5,7 +5,7 @@ import java.util.Map;
 public interface MST_RMI extends Remote{
 
 
-    void construct_key(Map<Integer, Neighbour_node> nn) throws RemoteException;
+    void construct_key(Map<Integer, NeighbourNode> nn) throws RemoteException;
     /**
      * receive a initial message, start finding the MOE
      * @param src index of the source
@@ -26,8 +26,9 @@ public interface MST_RMI extends Remote{
 
     void receive_report (int src, int weight) throws RemoteException;
 
-    void receive_change_root(int src) throws RemoteException;
+    void receive_change_root() throws RemoteException;
 
     void receive_connect(int src, int level) throws RemoteException;
 
+    State_node getSN();
 }

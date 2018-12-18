@@ -1,15 +1,19 @@
 //this class store the information for a neighbouring node
-public class Neighbour_node {
+public class NeighbourNode {
     private int index; // index of the node
     private int weight; //weight of the edge to this node
     private State_edge SE; //state of the edge to this node
     private MST_RMI node; // interface to invoke functions on this node
 
-    void Neighbour_node(int index, int weight, State_edge SE, MST_RMI node){
+    public NeighbourNode(int index, int weight, State_edge SE, MST_RMI node){
         this.index = index;
         this.weight = weight;
         this.SE = SE;
         this.node = node;
+    }
+
+    public NeighbourNode(){
+
     }
 
     public void setNode(MST_RMI node) {
