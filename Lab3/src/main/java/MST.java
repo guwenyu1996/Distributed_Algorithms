@@ -148,6 +148,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         // if such neighbour node is founded, send test message
         // if no, means all neighbours have been tested, report the best edge right now
         if(minNeigh != -1){
+            test_edge = minNeigh;
             SE.get(minNeigh).getNode().receive_test(index, LN, FN);
             logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
                     "Test: Send Test Msg to P" + minNeigh);
@@ -192,6 +193,8 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
                 // Reject if neighbour node is in same fragment
             else{
                 if(fragment_name != FN) {
+                    SE.get(src).getNode().receive_accept(index);
+                }else{
                     logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
                             "P" + src + " Test Msg is rejected.");
 
@@ -215,9 +218,9 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
                 "P" + src + "Accept.");
         test_edge = NIL;
         int propose = SE.get(src).getWeight();
-        if(best_weight > propose){
-            best_weight = propose;
+        if( propose < best_weight){
             best_edge = src;
+            best_weight = propose;
             logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
                     "bWeight = " + best_weight + "bEdge = " + best_edge);
         }

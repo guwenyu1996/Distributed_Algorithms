@@ -118,7 +118,7 @@ public class testcase {
 
             Integer temp = array[position1];
             array[position1] = array[position2];
-            array[position2] = array[position1];
+            array[position2] = temp;
         }
     }
 }
