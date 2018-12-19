@@ -81,6 +81,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         this.index = index;
         SE = new HashMap<Integer, NeighbourNode>();
         queue = new LinkedList<Message>();
+        halt = false;
     }
 
 
@@ -102,6 +103,9 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
      * @param s state of the sender
      */
     public void receive_initiate(int src, int level, int fragment_name, State_node s) throws RemoteException{
+
+        logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
+                "P" + src + " Initiate Msg: level = " + level + " frag = " + fragment_name + " state = " + s);
         LN = level;
         FN = fragment_name;
         SN = s;
@@ -143,9 +147,14 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
 
         // if such neighbour node is founded, send test message
         // if no, means all neighbours have been tested, report the best edge right now
-        if(minNeigh != -1)
+        if(minNeigh != -1){
             SE.get(minNeigh).getNode().receive_test(index, LN, FN);
+            logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
+                    "Test: Send Test Msg to P" + minNeigh);
+        }
         else{
+            logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
+                    "Test: no MOE");
             test_edge = NIL;
             report();
         }
@@ -159,6 +168,9 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
      * @throws RemoteException
      */
     public void receive_test(int src, int level, int fragment_name) throws RemoteException{
+        logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
+                "P" + src + " Test Msg: level = " + level + " frag = " + fragment_name);
+
         if(SN == State_node.Sleeping)
             wakeup();
 
@@ -167,20 +179,30 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
             msg.setLevel(level);
             msg.setFragment(fragment_name);
             queue.add(msg);
+
+            logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
+                    "P" + src + " Test Msg is postponed.");
         }else{ // absorb
             // absorb subtree which is not in same fragment
-            if(fragment_name != FN)
+            if(fragment_name != FN){
+                logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
+                        "P" + src + " Test Msg is accepted.");
                 SE.get(src).getNode().receive_accept(index);
-
+            }
                 // Reject if neighbour node is in same fragment
             else{
-                if(SE.get(src).getSE() == State_edge.P_in_MST)
-                    SE.get(src).setSE(State_edge.Not_in_MST);
+                if(fragment_name != FN) {
+                    logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
+                            "P" + src + " Test Msg is rejected.");
 
-                if(test_edge != src)
-                    SE.get(src).getNode().receive_reject(index);
-                else
-                    test();
+                    if (SE.get(src).getSE() == State_edge.P_in_MST)
+                        SE.get(src).setSE(State_edge.Not_in_MST);
+
+                    if (test_edge != src)
+                        SE.get(src).getNode().receive_reject(index);
+                    else
+                        test();
+                }
             }
         }
     }
@@ -189,16 +211,22 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
      * If receive an accept, absorbs a subtree.
      */
     public void receive_accept(int src) throws RemoteException{
+        logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
+                "P" + src + "Accept.");
         test_edge = NIL;
         int propose = SE.get(src).getWeight();
         if(best_weight > propose){
             best_weight = propose;
             best_edge = src;
+            logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
+                    "bWeight = " + best_weight + "bEdge = " + best_edge);
         }
         report();
     }
 
     public void receive_reject(int src) throws RemoteException{
+        logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
+                "P" + src + "Reject.");
         if(SE.get(src).getSE() == State_edge.P_in_MST)
             SE.get(src).setSE(State_edge.Not_in_MST);
 
@@ -230,7 +258,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
             if(weight > this.best_edge){
                 change_root();
             }else if(weight == INF && best_weight == INF){
-                halt = true;
+                halt();
             }
         }
         // fixme add message in a queue?
@@ -354,4 +382,12 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
             }
         }
     }
+
+    private void halt(){
+        halt = true;
+        logger.info("------- Construct MST -------");
+        // fixme print mst
+    }
+
+
 }
