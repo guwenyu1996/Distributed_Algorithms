@@ -69,10 +69,15 @@ public class testcase {
 
     @Test
     public void test1() throws RemoteException{
-        Integer weights[] = {0,1,2,3,4,5};
+        int num_nodes = 3;
+
+        Integer weights[] = new Integer[num_nodes];
+        for(int i =0; i < num_nodes ; i ++)
+            weights[i] = i;
+
         randomize(weights);
 
-        int num_nodes = 4;
+
 
         List<Map<Integer, NeighbourNode>> nodes = new LinkedList<Map<Integer, NeighbourNode>>();
         for(int i =0; i< num_nodes; i++){
@@ -102,11 +107,6 @@ public class testcase {
         for(int i=0; i < num_nodes; i++) {
             processes.get(i).construct_key(nodes.get(i));
         }
-
-    }
-
-    @Test
-    public void test2() throws RemoteException{
 
     }
 
