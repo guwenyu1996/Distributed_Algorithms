@@ -170,7 +170,9 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
      */
     public void receive_test(int src, int level, int fragment_name) throws RemoteException{
         logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
-                "P" + src + " Test Msg: level = " + level + " frag = " + fragment_name);
+                "Receive P" + src + " Test Msg: level = " + level + " frag = " + fragment_name);
+
+        handleQueue();
 
         if(SN == State_node.Sleeping)
             wakeup();
@@ -215,21 +217,21 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
      */
     public void receive_accept(int src) throws RemoteException{
         logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
-                "P" + src + "Accept.");
+                "Receive P" + src + "Accept Msg");
         test_edge = NIL;
         int propose = SE.get(src).getWeight();
         if( propose < best_weight){
             best_edge = src;
             best_weight = propose;
             logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
-                    "bWeight = " + best_weight + "bEdge = " + best_edge);
+                    "bestW = " + best_weight + "bestE = " + best_edge);
         }
         report();
     }
 
     public void receive_reject(int src) throws RemoteException{
         logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
-                "P" + src + "Reject.");
+                "Receive P" + src + "Reject Msg");
         if(SE.get(src).getSE() == State_edge.P_in_MST)
             SE.get(src).setSE(State_edge.Not_in_MST);
 
@@ -247,6 +249,9 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
      * @throws RemoteException
      */
     public void receive_report (int src, int weight) throws RemoteException{
+        logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
+                "Receive P" + src + "Report Msg with weight = " + weight + "bestW = " + best_weight);
+        handleQueue();
 
         if(src != this.in_branch){
             // receive report from own subtree
@@ -264,7 +269,6 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
                 halt();
             }
         }
-        // fixme add message in a queue?
     }
 
     /**
@@ -272,6 +276,8 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
      * @throws RemoteException
      */
     public void receive_change_root() throws RemoteException{
+        logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
+                "Receive Change Root Msg");
         change_root();
     }
 
@@ -295,9 +301,14 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
      * @throws RemoteException
      */
     public void receive_connect(int src, int level) throws RemoteException{
+        logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
+                "Receive P" + src + "Connect Msg with level = " + level);
+
         if(this.SN == State_node.Sleeping){
             wakeup();
         }
+
+        handleQueue();
 
         if(level < this.LN){
             SE.get(src).setSE(State_edge.In_MST);
@@ -331,8 +342,11 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
      */
     private void report() throws RemoteException{
         if(this.find_count == 0 && this.test_edge == NIL){
+            logger.info("< " + LN + ", " + FN + ", " + SN + ") " +
+                    "Send Report to P" + in_branch + " bestW = " + best_weight);
             this.SN =  State_node.Found;
             this.SE.get(this.in_branch).getNode().receive_report(this.index,this.best_weight);
+
         }
     }
 
@@ -340,6 +354,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
      * Activate a node by send a connect message to MOE.
      */
     private void wakeup() throws RemoteException{
+        logger.info("Wake up");
 
         // searching for neighbour nodes with minimal weight
         int min = Integer.MAX_VALUE;
@@ -388,8 +403,11 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
 
     private void halt(){
         halt = true;
-        logger.info("------- Construct MST -------");
-        // fixme print mst
+        logger.info("------- Construct MST Finished --------");
+        for (Map.Entry<Integer, NeighbourNode> iter : SE.entrySet()){
+            logger.info("P" + index + " ------- P" + iter.getKey() + " weight = "
+                    + iter.getValue().getWeight());
+        }
     }
 
 
