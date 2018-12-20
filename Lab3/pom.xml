@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>tudelft.nl</groupId>
-    <artifactId>Lab1</artifactId>
+    <artifactId>Lab3</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <!--<properties>-->
@@ -54,7 +54,7 @@
                         <manifest>
                             <addClasspath>true</addClasspath>
                             <classpathPrefix>lib/</classpathPrefix>
-                            <mainClass>DA_Schiper_Eggli_Sandoz_main</mainClass>
+                            <mainClass>MST_main</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

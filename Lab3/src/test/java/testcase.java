@@ -73,7 +73,7 @@ public class testcase {
 
         Integer weights[] = new Integer[num_nodes];
         for(int i =0; i < num_nodes ; i ++)
-            weights[i] = i;
+            weights[i] = i+ num_nodes;
 
         randomize(weights);
 
@@ -90,11 +90,13 @@ public class testcase {
                 NeighbourNode node1 = new NeighbourNode();
                 node1.setWeight(weights[weight_select]);
                 node1.setIndex(j);
+                node1.setSE(State_edge.P_in_MST);
                 node1.setNode(processes.get(j));
                 nodes.get(i).put(j,node1);
 
                 NeighbourNode node2 = new NeighbourNode();
                 node2.setWeight(weights[weight_select]);
+                node2.setSE(State_edge.P_in_MST);
                 node2.setIndex(i);
                 node2.setNode(processes.get(i));
                 nodes.get(j).put(i,node2);

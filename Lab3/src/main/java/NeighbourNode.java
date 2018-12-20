@@ -1,19 +1,18 @@
+import java.io.Serializable;
+
 //this class store the information for a neighbouring node
-public class NeighbourNode {
+public class NeighbourNode implements Serializable {
     private int index; // index of the node
     private int weight; //weight of the edge to this node
     private State_edge SE; //state of the edge to this node
     private MST_RMI node; // interface to invoke functions on this node
 
-    public NeighbourNode(int index, int weight, State_edge SE, MST_RMI node){
-        this.index = index;
-        this.weight = weight;
-        this.SE = SE;
-        this.node = node;
+    public NeighbourNode(){
     }
 
-    public NeighbourNode(){
-
+    @Override
+    public String toString() {
+        return "index of neighbor is "+ index + "weight is " + weight;
     }
 
     public void setNode(MST_RMI node) {
