@@ -103,10 +103,16 @@ public class testcase {
             }
         }
 
+        for(int i =0; i < num_nodes; i++){
+            logger.info("the graph of node " + i +" is: " + nodes.get(i).toString());
+        }
+
 
         for(int i=0; i < num_nodes; i++) {
             processes.get(i).construct_key(nodes.get(i));
         }
+
+        processes.get(0).start();
 
     }
 

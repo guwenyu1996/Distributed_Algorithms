@@ -30,5 +30,7 @@ public interface MST_RMI extends Remote{
 
     void receive_connect(int src, int level) throws RemoteException;
 
+    void start() throws RemoteException;
+
     State_node getSN();
 }
