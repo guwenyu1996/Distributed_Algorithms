@@ -85,6 +85,9 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         FN = index;
         queue = new LinkedList<Message>();
         halt = false;
+        find_count = 0;
+        test_edge = NIL;
+        best_weight = INF;
     }
 
 
@@ -268,7 +271,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
             report();
         }else if(SN == State_node.Found){
             // receive report from the other side of core edge
-            if(weight > this.best_edge){
+            if(weight > this.best_weight){
                 change_root();
             }else if(weight == INF && best_weight == INF){
                 halt();
@@ -321,6 +324,10 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
             if(this.SN == State_node.Find){
                 this.find_count ++;
             }
+
+            if(src == test_edge)
+                test();
+
         }else{
             // merge two subtrees
             if(SE.get(src).getSE() == State_edge.P_in_MST){
@@ -332,8 +339,9 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
                 LN ++;
                 FN = this.SE.get(src).getWeight();
                 in_branch = src;
-                find_count ++;
-                SE.get(src).getNode().receive_initiate(this.index, this.LN +1, FN, State_node.Find);
+                SN = State_node.Find;
+                SE.get(src).getNode().receive_initiate(this.index, this.LN, FN, State_node.Find);
+                test();
             }
         }
     }
