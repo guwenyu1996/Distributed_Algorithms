@@ -347,6 +347,21 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
     }
 
 
+    public void receive_print(int src) throws RemoteException{
+
+        for (Map.Entry<Integer, NeighbourNode> iter : SE.entrySet()) {
+            NeighbourNode neighbour = iter.getValue();
+            if(neighbour.getSE() == State_edge.In_MST) {
+                logger.info("P" + index + " ------- P" + iter.getKey() + " weight = "
+                        + iter.getValue().getWeight());
+
+                if(src != neighbour.getIndex())
+                    neighbour.getNode().receive_print(index);
+            }
+        }
+    }
+
+
     /**
      * Function for thread
      */
@@ -418,13 +433,10 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         }
     }
 
-    private void halt(){
+    private void halt()throws RemoteException{
         halt = true;
         logger.info("------- Construct MST Finished --------");
-        for (Map.Entry<Integer, NeighbourNode> iter : SE.entrySet()){
-            logger.info("P" + index + " ------- P" + iter.getKey() + " weight = "
-                    + iter.getValue().getWeight());
-        }
+        receive_print(index);
     }
 
 
