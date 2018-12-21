@@ -10,6 +10,7 @@ public class Message {
     private int weight;
     private int fragment;
     private int sequence;
+    private  State_node state;
 
     public Message(MessageType type, int src){
         this.src = src;
@@ -36,6 +37,10 @@ public class Message {
         return src;
     }
 
+    public State_node getState() {
+        return state;
+    }
+
     public void setFragment(int fragment) {
         this.fragment = fragment;
     }
@@ -56,4 +61,7 @@ public class Message {
         this.sequence = sequence;
     }
 
+    public void setState(State_node state) {
+        this.state = state;
+    }
 }

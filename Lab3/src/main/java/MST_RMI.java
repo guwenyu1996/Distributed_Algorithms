@@ -13,22 +13,12 @@ public interface MST_RMI extends Remote{
      * @param fragment_name fracment name of the sender
      * @param s state of the sender
      */
-    void receive_initiate(int src, int level, int fragment_name, State_node s) throws RemoteException;
-
-    void receive_test(int src, int level, int fragment_name) throws RemoteException;
 
     /**
      * receive a accept message
      */
-    void receive_accept(int src) throws RemoteException;
 
-    void receive_reject(int src) throws RemoteException;
-
-    void receive_report (int src, int weight) throws RemoteException;
-
-    void receive_change_root() throws RemoteException;
-
-    void receive_connect(int src, int level) throws RemoteException;
+    void receive_message(Message msg)  throws RemoteException;
 
     void start() throws RemoteException;
 
