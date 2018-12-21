@@ -69,15 +69,14 @@ public class testcase {
 
     @Test
     public void test1() throws RemoteException{
-        int num_nodes = 3;
+        int num_nodes = 4;
+        int edgeNum = num_nodes * (num_nodes - 1) / 2;
 
-        Integer weights[] = new Integer[num_nodes];
-        for(int i =0; i < num_nodes ; i ++)
+        Integer weights[] = new Integer[edgeNum];
+        for(int i =0; i < edgeNum ; i ++)
             weights[i] = i+ num_nodes;
 
         randomize(weights);
-
-
 
         List<Map<Integer, NeighbourNode>> nodes = new LinkedList<Map<Integer, NeighbourNode>>();
         for(int i =0; i< num_nodes; i++){
@@ -119,7 +118,7 @@ public class testcase {
     }
 
     void randomize(Integer array[]){
-        Random r = new Random(1);
+        Random r = new Random(3);
         for(int i =0; i <array.length;i++ ){
             int position1 = r.nextInt(array.length);
             int position2 = r.nextInt(array.length);

@@ -154,10 +154,10 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         // if such neighbour node is founded, send test message
         // if no, means all neighbours have been tested, report the best edge right now
         if(minNeigh != -1){
-            test_edge = minNeigh;
-            SE.get(minNeigh).getNode().receive_test(index, LN, FN);
             logger.info("< " + LN + ", " + FN + ", " + SN + "> " + "find count: " + find_count + "test edge: " + test_edge +
                     "Test: Send Test Msg to P" + minNeigh);
+            test_edge = minNeigh;
+            SE.get(minNeigh).getNode().receive_test(index, LN, FN);
         }
         else{
             logger.info("< " + LN + ", " + FN + ", " + SN + "> " + "find count: " + find_count + "test edge: " + test_edge +
@@ -180,7 +180,6 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
 
         if(SN == State_node.Sleeping){
             wakeup();
-            return;
         }
 
         handleQueue();
