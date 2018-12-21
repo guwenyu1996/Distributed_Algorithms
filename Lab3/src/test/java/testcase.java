@@ -39,7 +39,6 @@ public class testcase {
         }
 
         String[] urls = config.getStringArray("node_url");
-        int index = 0;
 
         try{
             LocateRegistry.createRegistry(1099);
@@ -47,11 +46,9 @@ public class testcase {
             MST_RMI process;
 
             for(String url: urls){
-                process = (MST_RMI)Naming.lookup(urls[index]);
+                process = (MST_RMI)Naming.lookup(url);
                 processes.add(process);
-                index ++;
             }
-
 
         }catch (RemoteException e1) {
             e1.printStackTrace();
@@ -69,7 +66,7 @@ public class testcase {
 
     @Test
     public void test1() throws RemoteException{
-        int num_nodes = 4;
+        int num_nodes = 5;
         int edgeNum = num_nodes * (num_nodes - 1) / 2;
 
         Integer weights[] = new Integer[edgeNum];
@@ -115,10 +112,15 @@ public class testcase {
 
         processes.get(0).start();
 
+        ///after process print all maps
+        for(int i =0; i < num_nodes; i++){
+            processes.get(i).test_print();
+        }
+
     }
 
     void randomize(Integer array[]){
-        Random r = new Random(3);
+        Random r = new Random(1);
         for(int i =0; i <array.length;i++ ){
             int position1 = r.nextInt(array.length);
             int position2 = r.nextInt(array.length);
