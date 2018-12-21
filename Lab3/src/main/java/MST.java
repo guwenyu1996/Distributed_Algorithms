@@ -65,6 +65,8 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
 
     private boolean isTest;
 
+    private int received, delieved;
+
 
     /**
      *  instead of storing the information of the edges, i prefer storing the
@@ -74,7 +76,6 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
     private Map<Integer, NeighbourNode> SE;
 
     private Queue<Message> queue;
-
 
     final static Logger logger = Logger.getLogger(MST.class);
 
@@ -91,6 +92,44 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         test_edge = NIL;
         best_weight = INF;
         isTest = false;
+    }
+
+    private class Receive extends Thread{
+        private Message message;
+
+        public Receive(Message msg){
+            super();
+            message = msg;
+        }
+
+        @Override
+        public void run(){
+
+            try{
+                synchronized(this){
+                    message.setSequence(received);
+                    received ++;
+                }
+
+                while(message.getSequence() != received){
+                    Thread.sleep(300);
+                }
+
+                switch (message.getType()){
+                    case INITIATE:
+                }
+
+            }catch(InterruptedException e){
+                logger.error(e.getMessage());
+            }
+
+        }
+    }
+
+
+    public void receive_message(Message msg) {
+
+
     }
 
 
@@ -122,6 +161,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         best_edge = NIL;
         best_weight = INF;
         isTest = false;
+        queue.clear();
 
         for (Map.Entry<Integer, NeighbourNode> iter : SE.entrySet()){
             NeighbourNode neighbour = iter.getValue();
@@ -337,7 +377,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         }else{
             // merge two subtrees
             if(SE.get(src).getSE() == State_edge.P_in_MST){
-                Message msg = new Message(MessageType.CONNECT, index);
+                Message msg = new Message(MessageType.CONNECT, src);
                 msg.setLevel(LN);
                 queue.add(msg);
             }else{

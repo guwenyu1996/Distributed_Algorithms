@@ -9,6 +9,7 @@ public class Message {
     private int level;
     private int weight;
     private int fragment;
+    private int sequence;
 
     public Message(MessageType type, int src){
         this.src = src;
@@ -46,4 +47,13 @@ public class Message {
     public void setLevel(int level) {
         this.level = level;
     }
+
+    public int getSequence() {
+        return sequence;
+    }
+
+    public void setSequence(int sequence) {
+        this.sequence = sequence;
+    }
+
 }

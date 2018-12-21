@@ -120,7 +120,7 @@ public class testcase {
     }
 
     void randomize(Integer array[]){
-        Random r = new Random(1);
+        Random r = new Random(3);
         for(int i =0; i <array.length;i++ ){
             int position1 = r.nextInt(array.length);
             int position2 = r.nextInt(array.length);

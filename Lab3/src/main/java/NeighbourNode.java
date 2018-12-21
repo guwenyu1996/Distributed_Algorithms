@@ -12,7 +12,7 @@ public class NeighbourNode implements Serializable {
 
     @Override
     public String toString() {
-        return "index of neighbor is "+ index + "weight is " + weight;
+        return "Neighbour index "+ index + " with weight " + weight;
     }
 
     public void setNode(MST_RMI node) {
