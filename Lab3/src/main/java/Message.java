@@ -1,8 +1,10 @@
+import java.io.Serializable;
+
 /**
  * since the connect message can be appended to the queue and be postponed,
  * i use this class to store the arguments of a connect function
  */
-public class Message {
+public class Message implements Serializable {
 
     private MessageType type;
     private int src;

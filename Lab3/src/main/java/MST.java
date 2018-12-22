@@ -249,7 +249,8 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
      * @param fragment_name
      * @throws RemoteException
      */
-    public void deliver_test(int src, int level, int fragment_name) throws RemoteException{
+    public boolean deliver_test(int src, int level, int fragment_name) throws RemoteException{
+        boolean isDeliverd = true;
         logger.info("< " + LN + ", " + FN + ", " + SN + ", " + find_count + ", " + test_edge + " > " +
                 "Receive P" + src + " Test Msg: level = " + level + " frag = " + fragment_name);
 
@@ -258,6 +259,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         }
 
         if(level > LN){
+            isDeliverd = false;
             Message msg = new Message(MessageType.TEST, src);
             msg.setLevel(level);
             msg.setFragment(fragment_name);
@@ -288,7 +290,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
                     if (SE.get(src).getSE() == State_edge.P_in_MST)
                         SE.get(src).setSE(State_edge.Not_in_MST);
 
-                    if (test_edge != src){
+                    if (test_edge != src && test_edge != NIL){
                         Message msg = new Message(MessageType.REJECT,index);
                         SE.get(src).getNode().receive_message(msg);
                         //SE.get(src).getNode().receive_reject(index);
@@ -298,6 +300,8 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
                 }
             }
         }
+
+        return isDeliverd;
     }
 
     /**
@@ -393,7 +397,8 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
      * @param level
      * @throws RemoteException
      */
-    public void deliver_connect(int src, int level) throws RemoteException{
+    public boolean deliver_connect(int src, int level) throws RemoteException{
+        boolean isDelivered = true;
         logger.info("< " + LN + ", " + FN + ", " + SN + ", " + find_count + ", " + test_edge + " > " +
                 "Receive P" + src + " Connect Msg with level = " + level);
 
@@ -420,6 +425,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         }else{
             // merge two subtrees
             if(SE.get(src).getSE() == State_edge.P_in_MST){
+                isDelivered = true;
                 Message msg = new Message(MessageType.CONNECT, src);
                 msg.setLevel(LN);
                 queue.add(msg);
@@ -440,6 +446,8 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
                 test();
             }
         }
+
+        return isDelivered;
     }
 
     public void test_print() throws RemoteException{
@@ -547,20 +555,20 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
 
             switch(msg.getType()){
                 case CONNECT: {
-                    logger.info("Handle Queue Connect msg from P" + msg.getSrc());
-                    deliver_connect(msg.getSrc(), msg.getLevel());
+                    if(deliver_connect(msg.getSrc(), msg.getLevel()))
+                        logger.info("Handle Queue Connect msg from P" + msg.getSrc());
                     break;
                 }
                 case TEST: {
-                    logger.info("Handle Queue Test msg from P" + msg.getSrc());
-                    deliver_test(msg.getSrc(), msg.getLevel(), msg.getFragment());
+                    if(deliver_test(msg.getSrc(), msg.getLevel(), msg.getFragment()))
+                        logger.info("Handle Queue Test msg from P" + msg.getSrc());
                     break;
                 }
-                case REPORT: {
-                    logger.info("Handle Queue Report msg from P" + msg.getSrc());
-                    deliver_report(msg.getSrc(), msg.getWeight());
-                    break;
-                }
+//                case REPORT: {
+//                    logger.info("Handle Queue Report msg from P" + msg.getSrc());
+//                    deliver_report(msg.getSrc(), msg.getWeight());
+//                    break;
+//                }
             }
         }
     }

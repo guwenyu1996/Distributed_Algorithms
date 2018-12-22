@@ -66,7 +66,7 @@ public class testcase {
 
     @Test
     public void test1() throws RemoteException{
-        int num_nodes = 5;
+        int num_nodes = 3;
         int edgeNum = num_nodes * (num_nodes - 1) / 2;
 
         Integer weights[] = new Integer[edgeNum];
@@ -111,6 +111,12 @@ public class testcase {
         }
 
         processes.get(0).start();
+
+        try{
+            Thread.sleep(10000);
+        }catch (InterruptedException e){
+            logger.error(e.getMessage());
+        }
 
         ///after process print all maps
         for(int i =0; i < num_nodes; i++){
