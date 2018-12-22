@@ -92,6 +92,8 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         test_edge = NIL;
         best_weight = INF;
         isTest = false;
+        received = 0;
+        delieved = 0;
     }
 
     private class Receive extends Thread{
@@ -111,7 +113,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
                     received ++;
                 }
 
-                while(message.getSequence() != received){
+                while(message.getSequence() != delieved){
                     Thread.sleep(300);
                 }
 
@@ -126,7 +128,9 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
                 }
 
                 //after processing the message  plus it
-                received++;
+                handleQueue();
+                delieved ++;
+
 
             }catch(InterruptedException e){
                 logger.error(e.getMessage());
@@ -172,8 +176,8 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         best_edge = NIL;
         best_weight = INF;
         // fixme
-        isTest = false;
-        queue.clear();
+//        isTest = false;
+//        queue.clear();
 
         for (Map.Entry<Integer, NeighbourNode> iter : SE.entrySet()){
             NeighbourNode neighbour = iter.getValue();
@@ -202,7 +206,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
      */
     public void test() throws RemoteException{
 // fixme
-        isTest = true;
+//        isTest = true;
 
         // search for MOE: a neighbour which has a minimal weight and is not examined
         int minNeigh = -1, min = Integer.MAX_VALUE;
@@ -252,8 +256,6 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         if(SN == State_node.Sleeping){
             wakeup();
         }
-
-        handleQueue();
 
         if(level > LN){
             Message msg = new Message(MessageType.TEST, src);
@@ -337,7 +339,6 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
     public void deliver_report (int src, int weight) throws RemoteException{
         logger.info("< " + LN + ", " + FN + ", " + SN + ", " + find_count + ", " + test_edge + " > " +
                 "Receive P" + src + "Report Msg with weight = " + weight + "bestW = " + best_weight);
-        handleQueue();
 
         if(src != this.in_branch){
             // receive report from own subtree
@@ -352,7 +353,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
             if(weight > this.best_weight){
                 change_root();
                 // fixme
-            }else if(weight == INF && best_weight == INF && halt == false && isTest == true){
+            }else if(weight == INF && best_weight == INF && halt == false){
 //                halt();
             }
         }
@@ -400,8 +401,6 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
             wakeup();
         }
 
-        handleQueue();
-
         if(level < this.LN){
             SE.get(src).setSE(State_edge.In_MST);
 
@@ -415,8 +414,8 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
                 this.find_count ++;
             }
 // fixme
-            if(src == test_edge)
-                test();
+//            if(src == test_edge)
+//                test();
 
         }else{
             // merge two subtrees
