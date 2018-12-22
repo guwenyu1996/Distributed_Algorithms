@@ -83,6 +83,10 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
     public MST(int processNum, int index)throws RemoteException {
         this.processNum = processNum;
         this.index = index;
+        reset();
+    }
+
+    public void reset() throws RemoteException{
         SN = State_node.Sleeping;
         SE = new HashMap<Integer, NeighbourNode>();
         LN = 0;
@@ -95,6 +99,12 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         isTest = false;
         received = 0;
         delieved = 0;
+
+        best_edge = 0;
+        in_branch = 0;
+
+        queue.clear();
+        logger.info("-----------------------------reset-----------------------------");
     }
 
     private class Receive extends Thread{
@@ -182,6 +192,8 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         // fixme
 //        isTest = false;
 //        queue.clear();
+        // fixme
+//        find_count = 0;
 
         for (Map.Entry<Integer, NeighbourNode> iter : SE.entrySet()){
             NeighbourNode neighbour = iter.getValue();
@@ -194,7 +206,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
                 msg.setState(SN);
                 neighbour.getNode().receive_message(msg);
 //                neighbour.getNode().receive_initiate(index, LN, FN, SN);
-                if(neighbour.getNode().getSN() == State_node.Find)
+                if(s == State_node.Find)
                     find_count ++;
             }
         }
@@ -288,19 +300,19 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
                     SE.get(src).getNode().receive_message(msg);
  //                   SE.get(src).getNode().receive_accept(index);
                 }else{
-                    logger.info("< " + LN + ", " + FN + ", " + SN + ", " + find_count + ", " + test_edge + " > " +
-                            "P" + src + " Test Msg is rejected.");
-
                     if (SE.get(src).getSE() == State_edge.P_in_MST)
                         SE.get(src).setSE(State_edge.Not_in_MST);
 
-                    if (test_edge != src && test_edge != NIL){
+                    //fixme
+                    if (test_edge != src){
                         Message msg = new Message(MessageType.REJECT,index);
                         SE.get(src).getNode().receive_message(msg);
                         //SE.get(src).getNode().receive_reject(index);
                     }
-                    else
+                    else{
                         test();
+                    }
+
                 }
             }
         }
@@ -356,7 +368,11 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
                 best_edge = src;
             }
             report();
-        }else if(SN == State_node.Found){
+        }else if(SN == State_node.Find){
+            Message msg = new Message(MessageType.REPORT,src);
+            msg.setWeight(weight);
+            queue.add(msg);
+        }else{
             // receive report from the other side of core edge
             if(weight > this.best_weight){
                 change_root();
@@ -566,11 +582,11 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
                     }
                     break;
                 }
-//                case REPORT: {
-//                    logger.info("Handle Queue Report msg from P" + msg.getSrc());
-//                    deliver_report(msg.getSrc(), msg.getWeight());
-//                    break;
-//                }
+                case REPORT: {
+                    logger.info("Handle Queue Report msg from P" + msg.getSrc());
+                    deliver_report(msg.getSrc(), msg.getWeight());
+                    break;
+                }
             }
         }
     }
@@ -583,6 +599,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
     public int getIn_branch() {
         return in_branch;
     }
+
 
 
 

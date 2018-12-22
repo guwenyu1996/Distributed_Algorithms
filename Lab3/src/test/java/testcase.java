@@ -66,7 +66,7 @@ public class testcase {
 
     @Test
     public void test1() throws RemoteException{
-        int num_nodes = 4;
+        int num_nodes = 5;
         int edgeNum = num_nodes * (num_nodes - 1) / 2;
 
         Integer weights[] = new Integer[edgeNum];
@@ -107,10 +107,13 @@ public class testcase {
 
 
         for(int i=0; i < num_nodes; i++) {
+            processes.get(i).reset();
             processes.get(i).construct_key(nodes.get(i));
         }
 
         processes.get(0).start();
+        processes.get(3).start();
+
 
 //        try{
 //            Thread.sleep(15000);
@@ -126,7 +129,7 @@ public class testcase {
     }
 
     void randomize(Integer array[]){
-        Random r = new Random(0);
+        Random r = new Random(9);
         for(int i =0; i <array.length;i++ ){
             int position1 = r.nextInt(array.length);
             int position2 = r.nextInt(array.length);
