@@ -425,7 +425,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         }else{
             // merge two subtrees
             if(SE.get(src).getSE() == State_edge.P_in_MST){
-                isDelivered = true;
+                isDelivered = false;
                 Message msg = new Message(MessageType.CONNECT, src);
                 msg.setLevel(LN);
                 queue.add(msg);
