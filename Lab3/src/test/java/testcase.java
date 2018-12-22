@@ -66,7 +66,7 @@ public class testcase {
 
     @Test
     public void test1() throws RemoteException{
-        int num_nodes = 3;
+        int num_nodes = 4;
         int edgeNum = num_nodes * (num_nodes - 1) / 2;
 
         Integer weights[] = new Integer[edgeNum];
@@ -112,21 +112,21 @@ public class testcase {
 
         processes.get(0).start();
 
-        try{
-            Thread.sleep(10000);
-        }catch (InterruptedException e){
-            logger.error(e.getMessage());
-        }
+//        try{
+//            Thread.sleep(15000);
+//        }catch (InterruptedException e){
+//            logger.error(e.getMessage());
+//        }
 
         ///after process print all maps
-        for(int i =0; i < num_nodes; i++){
-            processes.get(i).test_print();
-        }
+//        for(int i =0; i < num_nodes; i++){
+//            processes.get(i).test_print();
+//        }
 
     }
 
     void randomize(Integer array[]){
-        Random r = new Random(3);
+        Random r = new Random(0);
         for(int i =0; i <array.length;i++ ){
             int position1 = r.nextInt(array.length);
             int position2 = r.nextInt(array.length);

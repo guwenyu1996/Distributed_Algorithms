@@ -5,5 +5,6 @@ public enum MessageType {
     CHANGE_ROOT,
     CONNECT,
     TEST,
-    REPORT
+    REPORT,
+    PRINT
 }

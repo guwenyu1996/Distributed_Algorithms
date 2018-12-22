@@ -24,7 +24,7 @@ public interface MST_RMI extends Remote{
 
     void receive_print(int src) throws RemoteException;
 
-    State_node getSN()throws RemoteException;
+    State_node getSN() throws RemoteException;
 
-    void test_print() throws RemoteException;
+    int getIn_branch() throws RemoteException;
 }
