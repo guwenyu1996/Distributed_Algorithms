@@ -83,7 +83,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
      */
     private Map<Integer, NeighbourNode> SE;
 
-    private Queue<Message> queue;
+    private LinkedList<Message> queue;
 
     final static Logger logger = Logger.getLogger(MST.class);
 
@@ -163,11 +163,11 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
                 }
                 switch (message.getType()){
                     case INITIATE:  deliver_initiate(message.getSrc(),message.getLevel(),message.getFragment(),message.getState());break;
-                    case TEST:      deliver_test(message.getSrc(), message.getLevel(),message.getFragment());break;
+                    case TEST:      deliver_test(message.getSrc(), message.getLevel(),message.getFragment(),false);break;
                     case ACCEPT:    deliver_accept(message.getSrc());break;
                     case REJECT:    deliver_reject(message.getSrc());break;
-                    case REPORT:    deliver_report(message.getSrc(),message.getWeight());break;
-                    case CONNECT:   deliver_connect(message.getSrc(),message.getLevel());break;
+                    case REPORT:    deliver_report(message.getSrc(),message.getWeight(),false);break;
+                    case CONNECT:   deliver_connect(message.getSrc(),message.getLevel(),false);break;
                     case CHANGE_ROOT: deliver_change_root();break;
 
                 }
@@ -291,7 +291,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
      * @param fragment_name
      * @throws RemoteException
      */
-    public boolean deliver_test(int src, int level, int fragment_name) throws RemoteException{
+    public boolean deliver_test(int src, int level, int fragment_name,boolean inQueue) throws RemoteException{
         boolean isDeliverd = true;
         logger.info("< " + LN + ", " + FN + ", " + SN + ", " + find_count + ", " + test_edge + " > " +
                 "Receive P" + src + " Test Msg: level = " + level + " frag = " + fragment_name);
@@ -305,7 +305,8 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
             Message msg = new Message(MessageType.TEST, src);
             msg.setLevel(level);
             msg.setFragment(fragment_name);
-            queue.add(msg);
+            if(!inQueue)
+                queue.add(msg);
 
             logger.info("< " + LN + ", " + FN + ", " + SN + ", " + find_count + ", " + test_edge + " > " +
                     "P" + src + " Test Msg is postponed.");
@@ -380,7 +381,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
      * @param weight
      * @throws RemoteException
      */
-    public boolean deliver_report (int src, int weight) throws RemoteException{
+    public boolean deliver_report (int src, int weight, boolean inQueue) throws RemoteException{
         logger.info("< " + LN + ", " + FN + ", " + SN + ", " + find_count + ", " + test_edge + " > " +
                 "Receive P" + src + "Report Msg with weight = " + weight + "bestW = " + best_weight);
 
@@ -396,7 +397,8 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         }else if(SN == State_node.Find){
             Message msg = new Message(MessageType.REPORT,src);
             msg.setWeight(weight);
-            queue.add(msg);
+            if(!inQueue)
+                queue.add(msg);
             isDeliverd = false;
         }else{
             // receive report from the other side of core edge
@@ -443,7 +445,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
      * @param level
      * @throws RemoteException
      */
-    public boolean deliver_connect(int src, int level) throws RemoteException{
+    public boolean deliver_connect(int src, int level, boolean inQueue) throws RemoteException{
         boolean isDelivered = true;
         logger.info("< " + LN + ", " + FN + ", " + SN + ", " + find_count + ", " + test_edge + " > " +
                 "Receive P" + src + " Connect Msg with level = " + level);
@@ -471,7 +473,8 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
                 isDelivered = false;
                 Message msg = new Message(MessageType.CONNECT, src);
                 msg.setLevel(level);
-                queue.add(msg);
+                if(!inQueue)
+                    queue.add(msg);
             }else{
                 Message msg = new Message(MessageType.INITIATE,index);
                 msg.setLevel(LN+1);
@@ -572,28 +575,29 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
     private void handleQueue() throws RemoteException{
 
         for(int i = 0; i < queue.size(); i ++){
-            Message msg = queue.poll();
-            if(msg == null)
-                break;
+            Message msg = queue.get(i);
 
             switch(msg.getType()){
                 case CONNECT:{
-                    if(deliver_connect(msg.getSrc(), msg.getLevel())) {
+                    if(deliver_connect(msg.getSrc(), msg.getLevel(), true)){
                         logger.info("Handle Queue Connect msg from P" + msg.getSrc());
+                        queue.remove(msg);
                         handleQueue();
                     }
                     break;
                 }
                 case TEST: {
-                    if(deliver_test(msg.getSrc(), msg.getLevel(), msg.getFragment())){
+                    if(deliver_test(msg.getSrc(), msg.getLevel(), msg.getFragment(), true)){
                         logger.info("Handle Queue Test msg from P" + msg.getSrc());
+                        queue.remove(msg);
                         handleQueue();
                     }
                     break;
                 }
                 case REPORT: {
-                    if(deliver_report(msg.getSrc(), msg.getWeight())){
+                    if(deliver_report(msg.getSrc(), msg.getWeight(),true)){
                         logger.info("Handle Queue Report msg from P" + msg.getSrc());
+                        queue.remove(msg);
                         handleQueue();
                     }
                     break;
