@@ -68,6 +68,11 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
 
     private int received, delieved;
 
+/////for statistic only
+    private List<Integer> connected; //store the indexes of connected process
+    private Map<MessageType,Integer> messageCount;
+    private int merge;
+    private int absorb;
 
     /**
      *  instead of storing the information of the edges, i prefer storing the
@@ -104,7 +109,34 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         in_branch = 0;
 
         queue.clear();
+
+
+        messageCount =new HashMap<MessageType, Integer>();
+        messageCount.put(MessageType.INITIATE,0);
+        messageCount.put(MessageType.ACCEPT,0);
+        messageCount.put(MessageType.REJECT,0);
+        messageCount.put(MessageType.CHANGE_ROOT,0);
+        messageCount.put(MessageType.CONNECT,0);
+        messageCount.put(MessageType.TEST,0);
+        messageCount.put(MessageType.REPORT,0);
+
+        in_branch=0;
+        merge = 0;
+        absorb = 0;
+
         logger.info("-----------------------------reset-----------------------------");
+
+    }
+
+    public ReturnMessage getStatistic()throws RemoteException{
+        while(halt == false){
+            try {
+                Thread.sleep(100);
+            }catch (InterruptedException e){
+                logger.info(e.getMessage());
+            }
+        }
+        return new ReturnMessage(in_branch, SE.get(in_branch).getWeight(), messageCount, merge, absorb);
     }
 
     private class Receive extends Thread{
@@ -156,6 +188,8 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
 
     public void receive_message(Message msg) throws RemoteException{
         logger.info("Receive a message " + msg.getType() + " from P" + msg.getSrc());
+
+        messageCount.put(msg.getType(),messageCount.get(msg.getType())+1);
 
         Receive receive = new Receive(msg);
         receive.start();
@@ -413,6 +447,8 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         }
 
         if(level < this.LN){
+            absorb ++;
+
             SE.get(src).setSE(State_edge.In_MST);
 
             Message msg = new Message(MessageType.INITIATE,index);
@@ -435,6 +471,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
                 msg.setLevel(LN+1);
                 msg.setFragment(this.SE.get(src).getWeight());
                 msg.setState(State_node.Find);
+                merge ++;
                 SE.get(src).getNode().receive_message(msg);
             }
         }
@@ -495,7 +532,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         // searching for neighbour nodes with minimal weight
         int min = Integer.MAX_VALUE;
         int minNeigh = 0;
-        for (Map.Entry<Integer, NeighbourNode> iter : SE.entrySet()) {
+        for (Map.Entry<Integer, NeighbourNode> iter : SE.entrySet()){
             NeighbourNode neighbour = iter.getValue();
             if(neighbour.getWeight() < min){
                 min = neighbour.getWeight();
@@ -566,8 +603,6 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
     public int getIn_branch() {
         return in_branch;
     }
-
-
 
 
 }

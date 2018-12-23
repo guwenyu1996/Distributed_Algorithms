@@ -29,4 +29,6 @@ public interface MST_RMI extends Remote{
     int getIn_branch() throws RemoteException;
 
     void reset() throws RemoteException;
+
+    ReturnMessage getStatistic()throws RemoteException;
 }

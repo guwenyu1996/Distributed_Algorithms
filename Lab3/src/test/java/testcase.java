@@ -1,3 +1,4 @@
+import com.sun.org.apache.bcel.internal.generic.RETURN;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
@@ -20,6 +21,11 @@ public class testcase {
 
     final static Logger logger = Logger.getLogger(testcase.class);
     List<MST_RMI> processes = new ArrayList<MST_RMI>();
+
+    Map<MessageType,Integer> messageCount;
+    int in_branch;
+    int merge;
+    int absorb;
 
     @Before
     public void Initialize(){
@@ -62,6 +68,18 @@ public class testcase {
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new RMISecurityManager());
         }
+
+        messageCount =new HashMap<MessageType, Integer>();
+        messageCount.put(MessageType.INITIATE,0);
+        messageCount.put(MessageType.ACCEPT,0);
+        messageCount.put(MessageType.REJECT,0);
+        messageCount.put(MessageType.CHANGE_ROOT,0);
+        messageCount.put(MessageType.CONNECT,0);
+        messageCount.put(MessageType.TEST,0);
+        messageCount.put(MessageType.REPORT,0);
+
+        merge = 0;
+        absorb = 0;
     }
 
     @Test
@@ -115,10 +133,39 @@ public class testcase {
         processes.get(2).start();
         processes.get(3).start();
 
+        for(int i=0; i < num_nodes; i++) {
+            ReturnMessage returnMessage = processes.get(i).getStatistic();
+            this.absorb += returnMessage.getAbsorb();
+            this.merge  += returnMessage.getMerge();
+
+            int count =this.messageCount.get(MessageType.INITIATE) + returnMessage.getMessageCount().get(MessageType.INITIATE);
+            this.messageCount.put(MessageType.INITIATE,count);
+
+            count =this.messageCount.get(MessageType.ACCEPT) + returnMessage.getMessageCount().get(MessageType.ACCEPT);
+            this.messageCount.put(MessageType.ACCEPT,count);
+
+            count =this.messageCount.get(MessageType.REJECT) + returnMessage.getMessageCount().get(MessageType.REJECT);
+            this.messageCount.put(MessageType.REJECT,count);
+
+            count =this.messageCount.get(MessageType.CHANGE_ROOT) + returnMessage.getMessageCount().get(MessageType.CHANGE_ROOT);
+            this.messageCount.put(MessageType.CHANGE_ROOT,count);
+
+            count =this.messageCount.get(MessageType.CONNECT) + returnMessage.getMessageCount().get(MessageType.CONNECT);
+            this.messageCount.put(MessageType.CONNECT,count);
+
+            count =this.messageCount.get(MessageType.TEST) + returnMessage.getMessageCount().get(MessageType.TEST);
+            this.messageCount.put(MessageType.TEST,count);
+
+            count =this.messageCount.get(MessageType.REPORT) + returnMessage.getMessageCount().get(MessageType.REPORT);
+            this.messageCount.put(MessageType.REPORT,count);
+
+            logger.info("information of process: " + i +" Message statistic" + messageCount + " P" +"i" + " is connected to P" + returnMessage.getIn_branch() + " with weight of " + returnMessage.getWeight());
+        }
+        logger.info( " Number of merge: " + this.merge/2 + " Number of abort: " + this.absorb);
     }
 
     void randomize(Integer array[]){
-        Random r = new Random(36);
+        Random r = new Random(7);
         for(int i =0; i <array.length;i++ ){
             int position1 = r.nextInt(array.length);
             int position2 = r.nextInt(array.length);
