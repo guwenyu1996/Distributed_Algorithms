@@ -572,33 +572,76 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
     }
 
 
+//    private void handleQueue() throws RemoteException{
+//        boolean isDelivered = true;
+//        while(isDelivered){
+//            isDelivered = false;
+//
+//            for(int i = 0; i < queue.size(); i ++){
+//                Message msg = queue.get(i);
+//
+//                switch(msg.getType()){
+//                    case CONNECT:{
+//                        if(deliver_connect(msg.getSrc(), msg.getLevel(), true)){
+//                            logger.info("Handle Queue Connect msg from P" + msg.getSrc());
+//                            queue.remove(msg);
+//                            isDelivered = true;
+//                        }
+//                        break;
+//                    }
+//                    case TEST: {
+//                        if(deliver_test(msg.getSrc(), msg.getLevel(), msg.getFragment(), true)){
+//                            logger.info("Handle Queue Test msg from P" + msg.getSrc());
+//                            queue.remove(msg);
+//                            isDelivered = true;
+//                        }
+//                        break;
+//                    }
+//                    case REPORT: {
+//                        if(deliver_report(msg.getSrc(), msg.getWeight(),true)){
+//                            logger.info("Handle Queue Report msg from P" + msg.getSrc());
+//                            queue.remove(msg);
+//                            isDelivered = true;
+//                        }
+//                        break;
+//                    }
+//                }
+//                if(isDelivered == true)
+//                    break;
+//            }
+//        }
+//
+//
+//
+//    }
+
     private void handleQueue() throws RemoteException{
-
-        for(int i = 0; i < queue.size(); i ++){
-            Message msg = queue.get(i);
-
-            switch(msg.getType()){
-                case CONNECT:{
-                    if(deliver_connect(msg.getSrc(), msg.getLevel(), true)){
+        boolean isDelivered = true;
+        while(isDelivered && !queue.isEmpty()) {
+            Message msg = queue.get(0);
+            isDelivered = false;
+            switch (msg.getType()) {
+                case CONNECT: {
+                    if (deliver_connect(msg.getSrc(), msg.getLevel(), true)) {
                         logger.info("Handle Queue Connect msg from P" + msg.getSrc());
                         queue.remove(msg);
-                        handleQueue();
+                        isDelivered = true;
                     }
                     break;
                 }
                 case TEST: {
-                    if(deliver_test(msg.getSrc(), msg.getLevel(), msg.getFragment(), true)){
+                    if (deliver_test(msg.getSrc(), msg.getLevel(), msg.getFragment(), true)) {
                         logger.info("Handle Queue Test msg from P" + msg.getSrc());
                         queue.remove(msg);
-                        handleQueue();
+                        isDelivered = true;
                     }
                     break;
                 }
                 case REPORT: {
-                    if(deliver_report(msg.getSrc(), msg.getWeight(),true)){
+                    if (deliver_report(msg.getSrc(), msg.getWeight(), true)) {
                         logger.info("Handle Queue Report msg from P" + msg.getSrc());
                         queue.remove(msg);
-                        handleQueue();
+                        isDelivered = true;
                     }
                     break;
                 }
@@ -606,7 +649,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         }
     }
 
-    private void halt()throws RemoteException{
+    private void halt() throws RemoteException{
         core = true;
         receive_print(index);
     }
