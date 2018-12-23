@@ -164,6 +164,29 @@ public class testcase {
         logger.info( " Number of merge: " + this.merge/2 + " Number of abort: " + this.absorb);
     }
 
+    public void drawGraph(int nodesNum){
+        try{
+
+            SimpleGraphView graph = new SimpleGraphView();
+
+            // add vertex
+            for(int i = 0; i < nodesNum; i ++)
+                graph.addVertex((Integer)i);
+
+            // add edge
+            for(int i=0; i < nodesNum; i++) {
+                ReturnMessage returnMessage = processes.get(i).getStatistic();
+                if(!graph.isRepeated(i, returnMessage.getWeight()))
+                    graph.addEdge(i, returnMessage.getIn_branch(), returnMessage.getWeight());
+            }
+
+            graph.draw();
+        }catch (RemoteException e){
+            logger.error(e.getMessage());
+        }
+    }
+
+
     void randomize(Integer array[]){
         Random r = new Random(7);
         for(int i =0; i <array.length;i++ ){
