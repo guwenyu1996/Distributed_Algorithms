@@ -20,13 +20,14 @@ import java.util.*;
 
 public class testcase {
 
+    final boolean isLocal = true;
+
     final static Logger logger = Logger.getLogger(testcase.class);
     List<MST_RMI> processes = new ArrayList<MST_RMI>();
 
-    Map<MessageType,Integer> messageCount;
-    int in_branch;
-    int merge;
-    int absorb;
+
+
+    int num_nodes =30;
 
     @Before
     public void Initialize(){
@@ -51,10 +52,18 @@ public class testcase {
             LocateRegistry.createRegistry(1099);
 
             MST_RMI process;
+            for(int i = 0; i < urls.length;i++){
+                if(isLocal){
+                    MST process_rmi = new MST(urls.length, i);
+                    logger.info("create server at" + urls[i]);
+                    new Thread(process_rmi).start();
+                    Naming.bind(urls[i], process_rmi);
+                    processes.add(process_rmi);
+                }else{
+                    process = (MST_RMI)Naming.lookup(urls[i]);
+                    processes.add(process);
+                }
 
-            for(String url: urls){
-                process = (MST_RMI)Naming.lookup(url);
-                processes.add(process);
             }
 
         }catch (RemoteException e1) {
@@ -63,29 +72,18 @@ public class testcase {
             e3.printStackTrace();
         } catch (NotBoundException e4){
             e4.printStackTrace();
+        }catch (AlreadyBoundException e5){
+            e5.printStackTrace();
         }
 
         // Create and install a security manager
         if (System.getSecurityManager() == null) {
             System.setSecurityManager(new RMISecurityManager());
         }
-
-        messageCount =new HashMap<MessageType, Integer>();
-        messageCount.put(MessageType.INITIATE,0);
-        messageCount.put(MessageType.ACCEPT,0);
-        messageCount.put(MessageType.REJECT,0);
-        messageCount.put(MessageType.CHANGE_ROOT,0);
-        messageCount.put(MessageType.CONNECT,0);
-        messageCount.put(MessageType.TEST,0);
-        messageCount.put(MessageType.REPORT,0);
-
-        merge = 0;
-        absorb = 0;
     }
 
     @Test
     public void test1() throws RemoteException{
-        int num_nodes = 5;
         int edgeNum = num_nodes * (num_nodes - 1) / 2;
 
         Integer weights[] = new Integer[edgeNum];
@@ -137,12 +135,18 @@ public class testcase {
             processes.get(i).construct_key(nodes.get(i));
         }
 
+        long start = System.currentTimeMillis();
+
+
         processes.get(0).start();
-        processes.get(2).start();
-        processes.get(3).start();
+        processes.get(1).start();
 
         processStatistic(num_nodes);
-        logger.info( " Number of merge: " + this.merge/2 + " Number of abort: " + this.absorb);
+
+        long end = System.currentTimeMillis();
+        logger.info( "The task takes" + (end -start) + "milliseconds");
+
+
         drawTree(num_nodes);
 
         try{
@@ -178,43 +182,58 @@ public class testcase {
     }
 
     void processStatistic(int num_nodes) throws RemoteException{
+        Map<MessageType,Integer> messageCount = new HashMap<MessageType, Integer>();
+
+        messageCount =new HashMap<MessageType, Integer>();
+        messageCount.put(MessageType.INITIATE,0);
+        messageCount.put(MessageType.ACCEPT,0);
+        messageCount.put(MessageType.REJECT,0);
+        messageCount.put(MessageType.CHANGE_ROOT,0);
+        messageCount.put(MessageType.CONNECT,0);
+        messageCount.put(MessageType.TEST,0);
+        messageCount.put(MessageType.REPORT,0);
+
+        int in_branch = 0;
+        int merge = 0;
+        int absorb = 0;
+
         for(int i=0; i < num_nodes; i++) {
             ReturnMessage returnMessage = processes.get(i).getStatistic();
-            this.absorb += returnMessage.getAbsorb();
-            this.merge  += returnMessage.getMerge();
+            absorb += returnMessage.getAbsorb();
+            merge  += returnMessage.getMerge();
 
 
-            int count =this.messageCount.get(MessageType.INITIATE) + returnMessage.getMessageCount().get(MessageType.INITIATE);
-            this.messageCount.put(MessageType.INITIATE,count);
+            int count =messageCount.get(MessageType.INITIATE) + returnMessage.getMessageCount().get(MessageType.INITIATE);
+            messageCount.put(MessageType.INITIATE,count);
 
-            count =this.messageCount.get(MessageType.ACCEPT) + returnMessage.getMessageCount().get(MessageType.ACCEPT);
-            this.messageCount.put(MessageType.ACCEPT,count);
+            count = messageCount.get(MessageType.ACCEPT) + returnMessage.getMessageCount().get(MessageType.ACCEPT);
+            messageCount.put(MessageType.ACCEPT,count);
 
-            count =this.messageCount.get(MessageType.REJECT) + returnMessage.getMessageCount().get(MessageType.REJECT);
-            this.messageCount.put(MessageType.REJECT,count);
+            count = messageCount.get(MessageType.REJECT) + returnMessage.getMessageCount().get(MessageType.REJECT);
+            messageCount.put(MessageType.REJECT,count);
 
-            count =this.messageCount.get(MessageType.CHANGE_ROOT) + returnMessage.getMessageCount().get(MessageType.CHANGE_ROOT);
-            this.messageCount.put(MessageType.CHANGE_ROOT,count);
+            count = messageCount.get(MessageType.CHANGE_ROOT) + returnMessage.getMessageCount().get(MessageType.CHANGE_ROOT);
+            messageCount.put(MessageType.CHANGE_ROOT,count);
 
-            count =this.messageCount.get(MessageType.CONNECT) + returnMessage.getMessageCount().get(MessageType.CONNECT);
-            this.messageCount.put(MessageType.CONNECT,count);
+            count =messageCount.get(MessageType.CONNECT) + returnMessage.getMessageCount().get(MessageType.CONNECT);
+            messageCount.put(MessageType.CONNECT,count);
 
-            count =this.messageCount.get(MessageType.TEST) + returnMessage.getMessageCount().get(MessageType.TEST);
-            this.messageCount.put(MessageType.TEST,count);
+            count = messageCount.get(MessageType.TEST) + returnMessage.getMessageCount().get(MessageType.TEST);
+            messageCount.put(MessageType.TEST,count);
 
-            count =this.messageCount.get(MessageType.REPORT) + returnMessage.getMessageCount().get(MessageType.REPORT);
-            this.messageCount.put(MessageType.REPORT,count);
+            count = messageCount.get(MessageType.REPORT) + returnMessage.getMessageCount().get(MessageType.REPORT);
+            messageCount.put(MessageType.REPORT,count);
 
 
-            logger.info("information of process: " + i +" Message statistic" + messageCount + " P" +i + " is connected to P" + returnMessage.getIn_branch() + " with weight of " + returnMessage.getWeight());
+            logger.info("information of process: " + i  + " P" +i + " is connected to P" + returnMessage.getIn_branch() + " with weight of " + returnMessage.getWeight() + "the level is "+ returnMessage.getLevel() +"whether core " + returnMessage.getCore());
         }
-
+        logger.info( " Number of merge: " + merge/2 + " Number of abort: " + absorb +" Message statistic" + messageCount);
 
     }
 
 
     void randomize(Integer array[]){
-        Random r = new Random(7);
+        Random r = new Random(18);
         for(int i =0; i <array.length;i++ ){
             int position1 = r.nextInt(array.length);
             int position2 = r.nextInt(array.length);

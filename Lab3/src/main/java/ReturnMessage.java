@@ -4,17 +4,21 @@ import java.util.Map;
 
 public class ReturnMessage implements Serializable {
     Map<MessageType,Integer> messageCount;
-    private  int in_branch;
+    private int in_branch;
     private int merge;
     private int absorb;
     private int weight; ///weight of the in_branch
+    private int level;
+    private boolean core;
 
-    public ReturnMessage(int in_branch, int weight, Map<MessageType,Integer> messageCount, int merge, int absorb){
+    public ReturnMessage(int in_branch, int weight, Map<MessageType,Integer> messageCount, int merge, int absorb, int level, boolean core){
         this.messageCount = messageCount;
         this.merge = merge;
         this.absorb = absorb;
         this.in_branch = in_branch;
         this.weight = weight;
+        this.level = level;
+        this.core = core;
     }
 
     public int getAbsorb() {
@@ -37,4 +41,12 @@ public class ReturnMessage implements Serializable {
     public int getWeight() {
         return weight;
     }
+
+    public int getLevel() {
+        return level;
+    }
+    public boolean getCore() {
+        return core;
+    }
+
 }

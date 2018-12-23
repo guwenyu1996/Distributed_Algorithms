@@ -49,10 +49,10 @@ public class SimpleGraphView {
 //        SimpleGraphView sgv = new SimpleGraphView(); // This builds the graph
         // Layout<V, E>, BasicVisualizationServer<V,E>
         Layout<Integer, String> layout = new CircleLayout(g);
-        layout.setSize(new Dimension(300,300));
+        layout.setSize(new Dimension(800,800));
         BasicVisualizationServer<Integer,String> vv =
                 new BasicVisualizationServer<Integer,String>(layout);
-        vv.setPreferredSize(new Dimension(350,350));
+        vv.setPreferredSize(new Dimension(850,850));
         // Setup up a new vertex to paint transformer...
         Transformer<Integer,Paint> vertexPaint = new Transformer<Integer,Paint>() {
             public Paint transform(Integer i) {
