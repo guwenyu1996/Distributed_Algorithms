@@ -112,24 +112,13 @@ public class testcase {
         }
 
         processes.get(0).start();
+        processes.get(2).start();
         processes.get(3).start();
-
-
-//        try{
-//            Thread.sleep(15000);
-//        }catch (InterruptedException e){
-//            logger.error(e.getMessage());
-//        }
-
-        ///after process print all maps
-//        for(int i =0; i < num_nodes; i++){
-//            processes.get(i).test_print();
-//        }
 
     }
 
     void randomize(Integer array[]){
-        Random r = new Random(9);
+        Random r = new Random(36);
         for(int i =0; i <array.length;i++ ){
             int position1 = r.nextInt(array.length);
             int position2 = r.nextInt(array.length);
