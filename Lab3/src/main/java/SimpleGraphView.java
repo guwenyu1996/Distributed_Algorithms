@@ -33,8 +33,8 @@ public class SimpleGraphView {
      * @param v2 parent node
      * @param weight
      */
-    public void addEdge(int v1, int v2, int weight){
-        g.addEdge(weight + "", v1, v2, EdgeType.DIRECTED);
+    public void addEdge(int v1, int v2, int weight, EdgeType type){
+        g.addEdge(weight + "", v1, v2, type);
     }
 
     public boolean isRepeated(int v, int edge){
@@ -49,7 +49,7 @@ public class SimpleGraphView {
 //        SimpleGraphView sgv = new SimpleGraphView(); // This builds the graph
         // Layout<V, E>, BasicVisualizationServer<V,E>
         Layout<Integer, String> layout = new CircleLayout(g);
-        layout.setSize(new Dimension(500,00));
+        layout.setSize(new Dimension(300,300));
         BasicVisualizationServer<Integer,String> vv =
                 new BasicVisualizationServer<Integer,String>(layout);
         vv.setPreferredSize(new Dimension(350,350));
@@ -82,7 +82,10 @@ public class SimpleGraphView {
     }
 
     public static void main(String[] args){
+        test();
+    }
 
+    public static void test(){
         SimpleGraphView graph = new SimpleGraphView();
 
         graph.addVertex(0);
@@ -90,19 +93,18 @@ public class SimpleGraphView {
         graph.addVertex(3);
         graph.addVertex(2);
 
-
         if(!graph.isRepeated(1, 5))
-            graph.addEdge(1, 3, 5);
+            graph.addEdge(1, 3, 5, EdgeType.DIRECTED);
 
         if(!graph.isRepeated(2, 4))
-            graph.addEdge(2, 3, 4);
+            graph.addEdge(2, 3, 4, EdgeType.DIRECTED);
 
         if(!graph.isRepeated(3, 5))
-            graph.addEdge(3, 1, 5);
+            graph.addEdge(3, 1, 5, EdgeType.DIRECTED);
 
 
         if(!graph.isRepeated(0, 6))
-            graph.addEdge(0, 1, 6);
+            graph.addEdge(0, 1, 6, EdgeType.DIRECTED);
 
         graph.draw();
     }

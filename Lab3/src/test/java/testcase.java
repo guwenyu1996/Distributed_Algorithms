@@ -1,4 +1,5 @@
 import com.sun.org.apache.bcel.internal.generic.RETURN;
+import edu.uci.ics.jung.graph.util.EdgeType;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
 import org.apache.log4j.Logger;
@@ -93,9 +94,11 @@ public class testcase {
 
         randomize(weights);
 
+        SimpleGraphView graph = new SimpleGraphView();
         List<Map<Integer, NeighbourNode>> nodes = new LinkedList<Map<Integer, NeighbourNode>>();
         for(int i =0; i< num_nodes; i++){
             nodes.add(new HashMap<Integer, NeighbourNode>());
+            graph.addVertex(i);
         }
 
         int weight_select = 0;
@@ -115,15 +118,20 @@ public class testcase {
                 node2.setNode(processes.get(i));
                 nodes.get(j).put(i,node2);
 
+                graph.addEdge(i, j, weights[weight_select], EdgeType.UNDIRECTED);
+
                 weight_select++;
             }
         }
 
+        // Draw complete graph
+        graph.draw();
+
+        // Print
         for(int i =0; i < num_nodes; i++){
             logger.info("the graph of node " + i +" is: " + nodes.get(i).toString());
         }
-
-
+        
         for(int i=0; i < num_nodes; i++) {
             processes.get(i).reset();
             processes.get(i).construct_key(nodes.get(i));
@@ -134,13 +142,20 @@ public class testcase {
         processes.get(3).start();
 
         processStatistic(num_nodes);
-        drawGraph(num_nodes);
-
-
         logger.info( " Number of merge: " + this.merge/2 + " Number of abort: " + this.absorb);
+        drawTree(num_nodes);
+
+        try{
+            while(true){
+                Thread.sleep(5000);
+            }
+        }catch (InterruptedException e){
+            e.printStackTrace();
+        }
+
     }
 
-    public void drawGraph(int nodesNum){
+    public void drawTree(int nodesNum){
         try{
 
             SimpleGraphView graph = new SimpleGraphView();
@@ -153,7 +168,7 @@ public class testcase {
             for(int i=0; i < nodesNum; i++) {
                 ReturnMessage returnMessage = processes.get(i).getStatistic();
                 if(!graph.isRepeated(i, returnMessage.getWeight()))
-                    graph.addEdge(i, returnMessage.getIn_branch(), returnMessage.getWeight());
+                    graph.addEdge(i, returnMessage.getIn_branch(), returnMessage.getWeight(), EdgeType.DIRECTED);
             }
 
             graph.draw();
