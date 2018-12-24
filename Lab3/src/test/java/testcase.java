@@ -27,7 +27,7 @@ public class testcase {
 
 
 
-    int num_nodes = 30;
+    int num_nodes = 100;
 
     @Before
     public void Initialize(){
