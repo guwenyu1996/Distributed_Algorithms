@@ -318,24 +318,16 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
             }
                 // Reject if neighbour node is in same fragment
             else{
-                //fixme
-    //            if(fragment_name != FN) {
-   //                 Message msg = new Message(MessageType.ACCEPT,index);
-   //                 SE.get(src).getNode().receive_message(msg);
-   //             }
-       //         else{
-                    if (SE.get(src).getSE() == State_edge.P_in_MST)
-                        SE.get(src).setSE(State_edge.Not_in_MST);
 
-                    if (test_edge != src){
-                        Message msg = new Message(MessageType.REJECT,index);
-                        SE.get(src).getNode().receive_message(msg);
-                    }
-                    else{
-                        test();
-                    }
+                if (SE.get(src).getSE() == State_edge.P_in_MST)
+                    SE.get(src).setSE(State_edge.Not_in_MST);
 
-  //              }
+                if (test_edge != src){
+                    Message msg = new Message(MessageType.REJECT,index);
+                    SE.get(src).getNode().receive_message(msg);
+                }
+                else
+                    test();
             }
         }
 
@@ -566,52 +558,7 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         return SN;
     }
 
-
-//    private void handleQueue() throws RemoteException{
-//        boolean isDelivered = true;
-//        while(isDelivered){
-//            isDelivered = false;
-//
-//            for(int i = 0; i < queue.size(); i ++){
-//                Message msg = queue.get(i);
-//
-//                switch(msg.getType()){
-//                    case CONNECT:{
-//                        if(deliver_connect(msg.getSrc(), msg.getLevel(), true)){
-//                            logger.info("Handle Queue Connect msg from P" + msg.getSrc());
-//                            queue.remove(msg);
-//                            isDelivered = true;
-//                        }
-//                        break;
-//                    }
-//                    case TEST: {
-//                        if(deliver_test(msg.getSrc(), msg.getLevel(), msg.getFragment(), true)){
-//                            logger.info("Handle Queue Test msg from P" + msg.getSrc());
-//                            queue.remove(msg);
-//                            isDelivered = true;
-//                        }
-//                        break;
-//                    }
-//                    case REPORT: {
-//                        if(deliver_report(msg.getSrc(), msg.getWeight(),true)){
-//                            logger.info("Handle Queue Report msg from P" + msg.getSrc());
-//                            queue.remove(msg);
-//                            isDelivered = true;
-//                        }
-//                        break;
-//                    }
-//                }
-//                if(isDelivered == true)
-//                    break;
-//            }
-//        }
-//
-//
-//
-//    }
-
     private void handleQueue() throws RemoteException{
-        boolean isDelivered = true;
         for(int i = 0; i < queue.size(); i ++){
             Message msg = queue.poll();
             if(msg == null)
