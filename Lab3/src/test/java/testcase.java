@@ -27,7 +27,7 @@ public class testcase {
 
 
 
-    int num_nodes =30;
+    int num_nodes = 30;
 
     @Before
     public void Initialize(){
@@ -139,7 +139,9 @@ public class testcase {
 
 
         processes.get(0).start();
-        processes.get(1).start();
+        processes.get(3).start();
+        processes.get(5).start();
+        processes.get(20).start();
 
         processStatistic(num_nodes);
 

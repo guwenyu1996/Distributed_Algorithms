@@ -70,7 +70,6 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
 
 
 /////for statistic only
-    private List<Integer> connected; //store the indexes of connected process
     private Map<MessageType,Integer> messageCount;
     private int merge;
     private int absorb;
@@ -146,18 +145,17 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
 
         public Receive(Message msg){
             super();
-            message = msg;
+            synchronized(this){
+                message = msg;
+                message.setSequence(received);
+                received ++;
+            }
         }
 
         @Override
         public void run(){
 
             try{
-                synchronized(this){
-                    message.setSequence(received);
-                    received ++;
-                }
-
                 while(message.getSequence() != delieved){
                     Thread.sleep(100);
                 }
