@@ -275,8 +275,6 @@ public class MST extends UnicastRemoteObject implements MST_RMI, Runnable{
         else{
             logger.info("< " + LN + ", " + FN + ", " + SN + ", " + find_count + ", " + test_edge + " > " +
                     "Test: no MOE");
-            //fixme
-//            best_weight = INF;
             test_edge = NIL;
             report();
         }

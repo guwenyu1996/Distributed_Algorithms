@@ -25,8 +25,6 @@ public class testcase {
     final static Logger logger = Logger.getLogger(testcase.class);
     List<MST_RMI> processes = new ArrayList<MST_RMI>();
 
-
-
     int num_nodes = 100;
 
     @Before
@@ -194,8 +192,7 @@ public class testcase {
         messageCount.put(MessageType.CONNECT,0);
         messageCount.put(MessageType.TEST,0);
         messageCount.put(MessageType.REPORT,0);
-
-        int in_branch = 0;
+        
         int merge = 0;
         int absorb = 0;
 
