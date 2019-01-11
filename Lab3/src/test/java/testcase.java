@@ -1,4 +1,3 @@
-import com.sun.org.apache.bcel.internal.generic.RETURN;
 import edu.uci.ics.jung.graph.util.EdgeType;
 import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.configuration2.ex.ConfigurationException;
@@ -25,7 +24,7 @@ public class testcase {
     final static Logger logger = Logger.getLogger(testcase.class);
     List<MST_RMI> processes = new ArrayList<MST_RMI>();
 
-    int num_nodes = 100;
+    int num_nodes = 30;
 
     @Before
     public void Initialize(){
@@ -192,7 +191,7 @@ public class testcase {
         messageCount.put(MessageType.CONNECT,0);
         messageCount.put(MessageType.TEST,0);
         messageCount.put(MessageType.REPORT,0);
-        
+
         int merge = 0;
         int absorb = 0;
 
@@ -232,7 +231,8 @@ public class testcase {
 
 
     void randomize(Integer array[]){
-        Random r = new Random(12);
+        int seed = 12;
+        Random r = new Random(seed);
         for(int i =0; i <array.length;i++ ){
             int position1 = r.nextInt(array.length);
             int position2 = r.nextInt(array.length);

@@ -46,7 +46,6 @@ public class SimpleGraphView {
     }
 
     public void draw() {
-//        SimpleGraphView sgv = new SimpleGraphView(); // This builds the graph
         // Layout<V, E>, BasicVisualizationServer<V,E>
         Layout<Integer, String> layout = new CircleLayout(g);
         layout.setSize(new Dimension(800,800));
@@ -59,18 +58,7 @@ public class SimpleGraphView {
                 return new Color(255, 204, 0);
             }
         };
-        // Set up a new stroke Transformer for the edges
-//        float dash[] = {10.0f};
-//        final Stroke edgeStroke = new BasicStroke(1.0f, BasicStroke.CAP_BUTT,
-//                BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f);
-//        Transformer<String, Stroke> edgeStrokeTransformer =
-//                new Transformer<String, Stroke>() {
-//                    public Stroke transform(String s) {
-//                        return edgeStroke;
-//                    }
-//                };
         vv.getRenderContext().setVertexFillPaintTransformer(vertexPaint);
-//        vv.getRenderContext().setEdgeStrokeTransformer(edgeStrokeTransformer);
         vv.getRenderContext().setVertexLabelTransformer(new ToStringLabeller());
         vv.getRenderContext().setEdgeLabelTransformer(new ToStringLabeller());
         vv.getRenderer().getVertexLabelRenderer().setPosition(Renderer.VertexLabel.Position.CNTR);
