@@ -1,6 +1,6 @@
 # Schiper-Eggli-Sandoz Algorithm on AWS
 
-Procedure of Using on AWS with Ubuntu OS
+Instructions of using on AWS with Ubuntu OS
 --
 Generate a .jar file of this project, copy it to the server
 
