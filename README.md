@@ -1,4 +1,4 @@
-# Distribured_Algorithms
+# IN4150 Distributed-Algorithms
 
 Lab1: causal ordering of point-to-point messages
 
